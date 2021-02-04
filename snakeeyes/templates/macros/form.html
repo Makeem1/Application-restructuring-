@@ -1,0 +1,70 @@
+{# The below macro will render the label field bold if it required and normal if it's not required. #}
+{% macro field_label(field) %}
+	<label class="{{ field.id }}">
+		{% if field.flags.required %}
+			<strong> {{field.label.text}} </strong>
+		{% else %}
+			{{ field.label.text }}
+		{% endif %}
+	</label>
+{% endmacro %}
+
+
+{# The below field will render out the error of the field. #}
+{% macro field_errors(field) %}
+	{% if field.errors %}
+		<ul class="list-unstyled text-danger field-error">
+			{% for error in field.errors %}
+				<li>{{ error | e  }}</li>
+			{% endfor %}
+		</ul>
+	{% endif %}
+{% endmacro %}
+
+
+{# The below field will render the look of the form field itself. #}
+{% macro field_input(field, css_class ='form-control ') %}
+	{{ field(class = css_class, **kwargs ) }}
+{% endmacro %}
+
+
+{# The below macro will render if the form field is a Boolean type. #}
+{% macro field_check( field ) %}
+	{{ field(type='checkbox', **kwargs) }} {{ field.label }}
+{% endmacro %}
+
+
+{# The below macro will render error for each field of the form.  #}
+{% macro form_group(field, css_class='') %}
+	{% if field.errors %}
+		{% set css_class = css_class + 'has-error' %}
+	{% endif %}
+
+	{% if field.type == 'BooleanField'  %}
+		<div class="checkbox {{ css_class }}">
+			{{ field_check(field, **kwargs) }}
+        </div>
+    
+	{% else %}
+		<div class=" form-group {{ css_class }}">
+			{{field_label(field)}}
+			{{ field_input(field , **kwargs) }}
+	{% endif %}
+
+	{{ field_errors(field) }}
+	{{ caller () }}
+	
+	</div>
+{% endmacro %}
+
+
+{% macro form_tag(endpoint, fid, css_class = '', method= 'post') %}
+<form action="{{ url_for(endpoint, **kwargs)}}" method='{{method}}' id='{{fid}}' class='{{ css_class }}' role='form'>
+
+	{{ form.hidden_tag() }}
+	{{ caller() }}
+
+</form>
+
+
+{% endmacro %}
