@@ -4,7 +4,7 @@ from snakeeyes.page import page
 
 @page.route('/')
 def home():
-    return render_template('page/homte.html')
+    return render_template('page/home.html')
 
 
 @page.route('/privacy')
