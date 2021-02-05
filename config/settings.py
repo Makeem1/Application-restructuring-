@@ -1,6 +1,6 @@
 DEBUG = True
 
-SERVER_NAME = 'localhost.localdomain:8000'
+SERVER_NAME = '127.0.0.1:5000'
 
 SECRET_KEY = 'hellowrodjkadyggcwffkuwhneuedxkewhig'
 
@@ -12,6 +12,8 @@ MAIL_USE_SSL = False
 MAIL_USERNAME = 'patrickpwilliamson9@gmail.com'  # This email is not correct and will be overwritten by instance file
 MAIL_PASSWORD = 'Olayinka1'  # This password is not and will be overwritten by instance settings file
 MAIL_DEFAULT_SENDER = 'patrickpwilliamson9@gmail.com'
+FLASKY_MAIL_SUBJECT_PREFIX = 'Snake Eyes'
+FLASKY_MAIL_SENDER = 'patrickpwilliamson9@gmail.com'
 
 # Celery configuration 
 CELERY_BROKER_URL = "redis://:olayinka@redis:6379/0"   #broker , password:olayinka and host:redis port:6379 database for redis : 0 
