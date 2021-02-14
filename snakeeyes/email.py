@@ -1,6 +1,8 @@
 from flask import current_app, render_template
 from threading import Thread
 
+from flask_mail import Message
+
 from snakeeyes.extensions import mail 
 
 
@@ -9,6 +11,7 @@ from snakeeyes.extensions import mail
 def send_async_email(app, msg):
     with app.app_context():
         mail.send(msg)
+
 
 def send_email(email, to, subject, template, **kwargs):
     app = current_app._get_current_object()

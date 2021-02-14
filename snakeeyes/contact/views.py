@@ -5,7 +5,7 @@ from flask import render_template, url_for, flash, redirect, request
 from snakeeyes.contact.forms import ContactForm
 
 from snakeeyes.contact import contact
-from snakeeyes.contact.task import send_email 
+from snakeeyes.email import send_email 
 
 
 @contact.route('/contact', methods=['GET', 'POST'])
@@ -21,7 +21,7 @@ def index():
         
         from snakeeyes.email import send_email
 
-        send_email.delay(email, message, 'contact', 'contact/mail/index' , data = data)
+        send_email(email, message, 'contact', 'contact/mail/index' , data = data)
         flash("You will get a response soon", 'success')
         return redirect(url_for('contact.index'))
 

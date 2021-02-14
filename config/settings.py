@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 DEBUG = True
 
 SERVER_NAME = '127.0.0.1:5000'
@@ -23,6 +25,16 @@ CELERY_TASK_SERIALIZER = 'json' # serialize json data
 CELERY_RESULT_SERIALIZER = 'json' # give the result as json data
 CELERY_REDIS_MAX_CONNECTIONS = 5  # 
 
+
+# Sqlalchemy 
+db_url = 'postgresql://snakeeyes:devpassword@postgress:5432/snakeeyes'
+SQLALCHEMY_DATABASE_URL = db_url
+SQLALCHEMY_TRACK_MODIFICATION = False
+
+# User 
+SEED_ADMIN_EMAIL = 'dev@local.host'
+SEED_ADMIN_PASSWORD = 'devpassword'
+REMEMBER_COOKIE_DURATION = timedelta(days=90)
 
 
 
