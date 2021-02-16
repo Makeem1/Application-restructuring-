@@ -1,5 +1,5 @@
 from flask import flash, request, url_for, render_template, redirect
-from snakeeyes.user.forms import LoginForm, RegisterForm, WelcomeForm, RequestPasswordResetForm, NewPasswordForm
+from snakeeyes.user.forms import LoginForm, RegisterForm, WelcomeForm, RequestPasswordResetForm, NewPasswordForm, UpdateAccountForm
 from snakeeyes.user import user
 from flask_login import login_user, logout_user, login_required, logout_user, current_user
 from snakeeyes.user.user_utils import safe_url
@@ -64,16 +64,19 @@ def confirm(token):
         flash('Invalid link confirmation or expires link ', 'info')
     return redirect(url_for('user.unconfirmed'))
 
+
 @user.before_app_request
 def before_request():
     if current_user.is_authenticated and not current_user.confirmed and request.endpoint[:5] != 'user.':
         return redirect(url_for('user.unconfirmed'))
+
 
 @user.before_app_request
 def after_access_page():
     if current_user.is_authenticated and not current_user.username and request.endpoint[:5] != 'page.':
         flash("Choose a username to continue our services.", 'success')
         return redirect(url_for('user.welcome'))
+
 
 @user.route('/unconfirmed')
 @login_required
@@ -106,6 +109,25 @@ def welcome():
     return render_template('user/welcome.html', form=form)
 
 
+
+@user.route('/updateaccount', methods=['GET', 'POST'])
+def updateaccount():
+    form = UpdateAccountForm()
+    if form.validate_on_submit():
+        new_password = form.password.data
+        new_email = form.email.data
+        if new_password:
+            current_user.password = new_password
+            flash('Your password has been updated', 'success')
+        elif new_email:
+            current_user.email = new_email
+            db.session.commit()
+            flash('Your email has been updated', 'success')
+            send_mail(current_user.email, 'contact', 'user/mail/index', token=token )
+        else:
+            flash("Your credentials has been updated", 'Thanks')
+
+
 @user.route('/requestpasswordreset', methods=['GET', 'POST'])
 @anonymous_required
 def requestpasswordreset():
@@ -125,9 +147,16 @@ def settings():
     return render_template('user/settings.html')
 
 
+
+
+
+
+
+
 @user.route('/account/newpassword/<token>', methods=['GET', 'POST'])
 @anonymous_required
 def newpassword(token):
+
 
     
     

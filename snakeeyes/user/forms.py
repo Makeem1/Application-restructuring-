@@ -1,6 +1,6 @@
 from flask_wtf import Form
 from wtforms import StringField, PasswordField, BooleanField
-from wtforms.validators import DataRequired, Length, EqualTo, ValidationError
+from wtforms.validators import DataRequired, Length, EqualTo, ValidationError, Optional
 from wtforms_components import EmailField, Email
 from snakeeyes.user.models import User
 
@@ -39,7 +39,18 @@ class RequestPasswordResetForm(Form):
 class NewPasswordForm(Form):
     password = StringField('Enter a new password', validators=[DataRequired(), Length(min=8, max=32, message="Your password must be 8-32 character long")])])
 
+class UpdateAccountForm(Form):
+    email = EmailField("Email", validators=[DataRequired(), Email(), Length(min=5, max=35)])
+    password = PasswordField('Password', validators=[Optional(), 
+                                            Length(min=8, max=32, message="Your password must be 8-32 character long")])
+    confirm_password = PasswordField("Confirm password", validators=[Optional(), 
+                                            Length(min=8, max=32, message="Your password must be 8-32 character long"), EqualTo(password, message='Your input must match the password field.')])
 
+    def validate_username(self, email):
+        user = User.query.filter_by(username=email.data).first()
+        if user:
+            raise ValidationError("Email already taken by another user, please choose another username. Thanks")
+            
 
 
 
