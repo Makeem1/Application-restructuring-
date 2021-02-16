@@ -1,0 +1,16 @@
+{% extends 'layouts/app.html' %}
+
+
+{% block title %}Verify your account to access our services{% endblock %}
+
+{% block body %}
+    <h2> Hello, thank you for registering with us today. Your email address is : <strong>{{current_user.email}}</strong>, please do the folowing to activate your account and start enjoying our services. Thanks </h2>
+    <ol>
+        <p><li>Verify your email by click the link sent to your email address provided during your registration. </li></p>
+        <br>
+        <p>Thanks for your corperation. If you do not get a confirmation link, click on the below link to resend your activation link and it will be sent to your email address. </p>
+
+
+       <strong><p>Need another confrimation email link</p></strong> <a href="{{url_for('user.resend_link')}}">Click here.</a>
+    </ol>
+{% endblock %}

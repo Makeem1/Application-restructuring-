@@ -1,0 +1,77 @@
+{% extends 'layouts/app.html' %}
+
+{% block title %}Account settings{% endblock %}
+
+
+
+{% block header %}
+  <nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed"
+                data-toggle="collapse" data-target="#navbar"
+                aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a href="{{ url_for('page.home') }}">
+          <img src="{{ url_for('static', filename='images/snake-eyes.jpg') }}"
+               class="img-responsive"
+               width="229" height="50" title="Snake Eyes" alt="Snake Eyes"/>
+        </a>
+      </div>
+      <div id="navbar" class="collapse navbar-collapse">
+        <ul class="nav navbar-nav navbar-right">
+          {% if current_user.is_authenticated %}
+            <li class="dropdown">
+              <li><a href="{{url_for('user.logout')}}">logout</a></li>
+              <ul class="dropdown-menu">
+                <li><a href="{{ url_for('user.settings') }}">Settings</a></li>
+                <li role="separator" class="divider"></li>
+                <li class="dropdown-header">Session</li>
+                <li><a href="{{ url_for('user.logout') }}">Log out</a></li>
+              </ul>
+            </li>
+          {% else %}
+            <li><a href="{{ url_for('user.login') }}">Log in</a></li>
+            <li><a href="{{ url_for('user.register') }}">Sign up</a></li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+{% endblock %}
+
+
+{% block body %}
+  <div class="row">
+    <div class="col-md-5">
+      <h2>Settings</h2>
+      <h4 class="text-muted margin-bottom">{{ current_user.email }}</h4>
+
+      <div class="list-group">
+        <a href="#"
+           class="list-group-item">
+          Update email and password
+        </a>
+        {% if current_user.username %}
+          <span class="list-group-item quarter-faded text-muted">
+            Your username is
+            <strong>{{ current_user.username }}</strong>
+          </span>
+        {% else %}
+          <a href="{{ url_for('user.welcome') }}"
+             class="list-group-item">
+            Pick a username
+          </a>
+        {% endif %}
+      </div>
+    </div>
+    <div class="col-md-5 col-md-push-1 col-md-offset-1">
+      <h2>Billing</h2>
+      <p>Coming soon...</p>
+    </div>
+  </div>
+{% endblock %}

@@ -5,7 +5,7 @@ from flask import render_template, url_for, flash, redirect, request
 from snakeeyes.contact.forms import ContactForm
 
 from snakeeyes.contact import contact
-from snakeeyes.email import send_email 
+from snakeeyes.email import contact_me 
 
 
 @contact.route('/contact', methods=['GET', 'POST'])
