@@ -1,0 +1,118 @@
+{% extends 'layouts/app.html' %}
+{% import 'macros/form.html' as f with context %}
+
+{% block title %} Sign up for new account  {% endblock %}
+
+{% block header %}
+  <nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed"
+                data-toggle="collapse" data-target="#navbar"
+                aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a href="{{ url_for('page.home') }}">
+          <img src="{{ url_for('static', filename='images/snake-eyes.jpg') }}"
+               class="img-responsive"
+               width="229" height="50" title="Snake Eyes" alt="Snake Eyes"/>
+        </a>
+      </div>
+      <div id="navbar" class="collapse navbar-collapse">
+        <ul class="nav navbar-nav navbar-right">
+          {% if current_user.is_authenticated %}
+            <li class="dropdown">
+              <a href="{{ url_for('user.settings') }}" class="dropdown-toggle"
+                 data-toggle="dropdown"
+                 role="button" aria-haspopup="true"
+                 aria-expanded="false">Account
+                <span class="caret"></span></a>
+                <li><a href="{{url_for('user.logout')}}">logout</a></li>
+              <ul class="dropdown-menu">
+                <li><a href="{{ url_for('user.settings') }}">Settings</a></li>
+                <li role="separator" class="divider"></li>
+                <li class="dropdown-header">Session</li>
+                <li><a href="{{ url_for('user.logout') }}">Log out</a></li>
+              </ul>
+            </li>
+          {% else %}
+            <li><a href="{{ url_for('user.login') }}">Log in</a></li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-md-5">
+        <h2>What are you waiting for?</h2>
+
+        <div class="media md-margin-bottom">
+            <div class="media-left">
+            <i class="fa fa-fw fa-3x fa-bullhorn text-primary"></i>
+            </div>
+            <div class="media-body">
+            <h4 class="media-heading">Place bets</h4>
+            <span class="text-muted">
+                Correctly guess the dice's roll.
+            </span>
+            </div>
+        </div>
+        <div class="media md-margin-bottom">
+            <div class="media-left">
+            <i class="fa fa-fw fa-3x fa-database text-primary"></i>
+            </div>
+            <div class="media-body">
+            <h4 class="media-heading">Win currency</h4>
+            <span class="text-muted">
+                Gain coins if your guess is correct.
+            </span>
+            </div>
+        </div>
+        <div class="media md-margin-bottom">
+            <div class="media-left">
+            <i class="fa fa-fw fa-3x fa-trophy text-primary"></i>
+            </div>
+            <div class="media-body">
+            <h4 class="media-heading">Leaderboard</h4>
+            <span class="text-muted">Compare your results to others.</span>
+            </div>
+        </div>
+        </div>
+    <div class="col-md-5 col-md-push-1 col-md-offset-1 well">
+    {% call f.form_tag('user.register') %}
+
+       
+        {% call f.form_group(form.email, css_class='sm-margin-bottom' , autofocus='autofocus', placeholder='Your email address')  %}
+        {% endcall %}
+
+        {% call f.form_group(form.password, css_class='sm-margin-bottom', autofocus='autofocus', placeholder='Input your password')  %}
+        {% endcall %}
+
+        {% call f.form_group(form.confirm_password, css_class='sm-margin-bottom' , autofocus='autofocus', placeholder='Confirm your password')  %}
+        {% endcall %}
+
+        <div class="row">
+            <div class="col-md-6">
+              <button type="submit" class="btn btn-primary btn-block">
+                Register
+              </button>
+            </div>
+            <div class="col-md-6">
+              <div class="visible-xs visible-sm sm-margin-top"></div>
+              <a href="{{ url_for('user.login') }}"
+                 class="btn btn-default btn-block">
+                Looking to sign in?
+              </a>
+            </div>
+        </div>     
+    {% endcall %}
+    </div>
+    </div>
+{% endblock %}
+

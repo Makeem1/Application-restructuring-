@@ -26,28 +26,14 @@
 
   <body>
     
-    <nav class="navbar navbar-default navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed"
-                  data-toggle="collapse" data-target="#navbar"
-                  aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a href="{{ url_for('page.home') }}">
-            <img src="{{ url_for('static', filename='images/snake-eyes.jpg') }}"
-                 class="img-responsive"
-                 width="229" height="50" title="Snake Eyes" alt="Snake Eyes"/>
-          </a>
-        </div>
-      </div>
-    </nav>
+
+    {% block header %}{% endblock %}  
 
     <main class="container">
       
+      {# This macro function below will render flash messsages in the next request. #}
+
+  
       {% with messages = get_flashed_messages(with_categories=True) %}
         {% if messages %}
           <div id="flash-messages" class="row sm-margin-top">
@@ -59,6 +45,7 @@
           </div>
         {% endif %}
       {% endwith %}
+
 
       <div class="md-margin-top">
         {% block heading %}{% endblock %}
@@ -72,10 +59,7 @@
       <div class="container">
         <ul class="list-inline">
           <li class="text-muted">Snake Eyes &copy; 2016</li>
-          <li><a href="{{ url_for('page.privacy') }}">Privacy Policy</a></li>
-          <li><a href="{{ url_for('page.terms') }}">Terms of Service</a></li>
-          <li><a href="{{ url_for('page.questions') }}">FAQ</a></li>
-          <li><a href="{{ url_for('contact.index') }}">Contact</a></li>
+          {% block footer %} {% endblock %}    
         </ul>
       </div>
     </footer>

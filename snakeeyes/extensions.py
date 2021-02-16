@@ -9,6 +9,6 @@ debug_toolbar = DebugToolbarExtension()
 mail = Mail()
 Csrf = CSRFProtect()
 db = SQLAlchemy()
-login = LoginManager()
+login_manager = LoginManager()
 
 
