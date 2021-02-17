@@ -1,5 +1,5 @@
 from flask import flash, request, url_for, render_template, redirect
-from snakeeyes.user.forms import LoginForm, RegisterForm, WelcomeForm, RequestPasswordResetForm, NewPasswordForm, UpdateAccountForm
+from snakeeyes.user.forms import LoginForm, RegisterForm, WelcomeForm, RequestPasswordResetForm, NewPasswordForm, UpdateAccountForm, PasswordField
 from snakeeyes.user import user
 from flask_login import login_user, logout_user, login_required, logout_user, current_user
 from snakeeyes.user.user_utils import safe_url
@@ -34,7 +34,8 @@ def login():
 @user.route('/logout')
 @login_required
 def logout():
-    logout_user(user)
+    logout_user()
+    flash("You are logged out". 'success')
     return redirect(url_for('user.login'))
 
 
@@ -111,7 +112,8 @@ def welcome():
 
 
 @user.route('/updateaccount', methods=['GET', 'POST'])
-def updateaccount():
+@login_required
+def update_credentails():
     form = UpdateAccountForm()
     if form.validate_on_submit():
         new_password = form.password.data
@@ -126,6 +128,7 @@ def updateaccount():
             send_mail(current_user.email, 'contact', 'user/mail/index', token=token )
         else:
             flash("Your credentials has been updated", 'Thanks')
+    return render_template('user/updatecredentials.html', form = form)
 
 
 @user.route('/requestpasswordreset', methods=['GET', 'POST'])
@@ -147,15 +150,21 @@ def settings():
     return render_template('user/settings.html')
 
 
-
-
-
-
-
-
 @user.route('/account/newpassword/<token>', methods=['GET', 'POST'])
 @anonymous_required
 def newpassword(token):
+    token = request.args.get('token')
+    form = PasswordForm()
+    if form.validate_on_submit():
+        if current_user.verify_token(token):
+            current_user.password = form.password.data
+            flash('Your password has been reset successfully.', 'success')
+        else:
+            flash('Invalid or expire link ', 'info')
+            return redirect(url_for('user.login'))
+    return render_template('user/newpassword.html', form=form)
+
+    
 
 
     

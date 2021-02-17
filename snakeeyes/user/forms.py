@@ -50,6 +50,10 @@ class UpdateAccountForm(Form):
         user = User.query.filter_by(username=email.data).first()
         if user:
             raise ValidationError("Email already taken by another user, please choose another username. Thanks")
+
+
+class PasswordForm(Form):
+    email = EmailField("Email", validators=[DataRequired(), Email(), Length(min=5, max=35)])
             
 
 
