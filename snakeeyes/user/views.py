@@ -10,9 +10,6 @@ from snakeeyes.extensions import db
 
 @user.route('/register', methods=['GET', 'POST'])
 def register():
-    if current_user.is_authenticated:
-        flash("Operation already performed", 'info')
-        return redirect(url_for('user.settings'))
     form = RegisterForm()
     if form.validate_on_submit():
         user = User(email=form.email.data, password=form.password.data)
@@ -39,7 +36,7 @@ def login():
                 user.track_user_activities(request.remote_addr)
                 next_page = request.args.get('next')
                 if next_page:
-                    return redirect(url_for(safe_url(next_page)))
+                    return redirect(safe_url(next_page))
                 else:
                     return redirect(url_for('page.home'))
             else:
@@ -58,10 +55,7 @@ def logout():
     flash("You are logged out", 'success')
     return redirect(url_for('user.login'))
 
-# @user.before_app_request
-# def before_request():
-#     if current_user.is_authenticated and not current_user.confirmed and request.endpoint != 'user.':
-#         return redirect(url_for('user.unconfirmed'))
+
 
 @user.route('/confirm/<token>')
 def confirm(token):
@@ -69,10 +63,15 @@ def confirm(token):
         return redirect(url_for('page.home'))
     if current_user.verify_token(token):
         flash("Your account has been confirmed", 'success')
-        return redirect(url_for('page.home'))
     else:
-        flash('Invalid link confirmation or expires link ', 'info')
-    return redirect(url_for('user.unconfirmed'))
+        flash('The confirmation link has expired or invalid', 'danger')
+    return redirect(url_for('page.home'))
+
+
+# @user.before_app_request
+# def before_request():
+#     if current_user.is_authenticated and not current_user.confirmed and request.endpoint != 'user.':
+#         return redirect(url_for('user.unconfirmed'))
 
 
 @user.route('/unconfirmed')

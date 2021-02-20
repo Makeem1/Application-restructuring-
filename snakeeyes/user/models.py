@@ -76,9 +76,6 @@ class User(UserMixin, db.Model):
         db.session.commit()
         return User.query.get(data['user_id'])
 
-    def create_table(self):
-        db.drop_all()
-        db.create_all()
 
         
 

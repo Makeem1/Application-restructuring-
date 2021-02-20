@@ -24,10 +24,10 @@ def contact_me(email, to, subject, template, **kwargs):
     return thr
 
 
-def send_mail(user, subject, template, **kwargs):
+def send_mail(to, subject, template, **kwargs):
     app = current_app._get_current_object()
     msg = Message(app.config['FLASKY_MAIL_SUBJECT_PREFIX'] + ' ' + subject,
-                  sender=app.config['FLASKY_MAIL_SENDER'], recipients=[user],
+                  sender=app.config['FLASKY_MAIL_SENDER'], recipients=[to],
                   reply_to=app.config['MAIL_DEFAULT_SENDER'])
     msg.body = render_template(template + '.txt', **kwargs)
     thr = Thread(target=send_async_email, args=[app, msg])
