@@ -1,21 +1,41 @@
 from flask import flash, request, url_for, render_template, redirect
 from snakeeyes.user.forms import LoginForm, RegisterForm, WelcomeForm, RequestPasswordResetForm, NewPasswordForm, UpdateAccountForm, PasswordField
 from snakeeyes.user import user
-from flask_login import login_user, logout_user, login_required, logout_user, current_user
+from flask_login import login_user, logout_user, login_required, current_user 
 from snakeeyes.user.user_utils import safe_url
-from snakeeyes.user.decorator import anonymous_required
+from snakeeyes.user.models import User
 from snakeeyes.email import send_mail
+from snakeeyes.extensions import db
+
+
+@user.route('/register', methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated:
+        flash("Operation already performed", 'info')
+        return redirect(url_for('user.settings'))
+    form = RegisterForm()
+    if form.validate_on_submit():
+        user = User(email=form.email.data, password=form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        token = user.generate_token()
+        send_mail(user.email, 'contact', 'user/mail/index', customer=user ,token=token )
+        flash('Your account has been created, you can now login with your email and password', 'success')
+        return redirect(url_for('user.login'))
+    return render_template('user/register.html', form = form )
 
 
 @user.route('/login', methods=['GET', 'POST'])
-@anonymous_required
 def login():
+    if current_user.is_authenticated:
+        flash("Operation already performed", 'info')
+        return redirect(url_for('user.settings'))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user is not None and user.verify_password(form.password.data):
-            flash("You're now logged in.", 'succcess')
             if login_user(user, remember=form.remember_me.data) and user.is_active():
+                flash('Log in successful', 'success')
                 user.track_user_activities(request.remote_addr)
                 next_page = request.args.get('next')
                 if next_page:
@@ -35,24 +55,13 @@ def login():
 @login_required
 def logout():
     logout_user()
-    flash("You are logged out". 'success')
+    flash("You are logged out", 'success')
     return redirect(url_for('user.login'))
 
-
-@user.route('/register', methods=['GET', 'POST'])
-@anonymous_required
-def register():
-    form = RegisterForm()
-    if form.validate_on_submit():
-        user = User(email=form.email.data, password=form.password.data)
-        db.session.add(user)
-        db.session.commit()
-        token = user.generate_token()
-        send_mail(user, 'contact', 'user/mail/index', token=token )
-        flash('Your account has been created, you can now login with your email and password', 'success')
-        return redirect(url_for('user.login'))
-    return render_template('user/register.html', form = form )
-
+# @user.before_app_request
+# def before_request():
+#     if current_user.is_authenticated and not current_user.confirmed and request.endpoint != 'user.':
+#         return redirect(url_for('user.unconfirmed'))
 
 @user.route('/confirm/<token>')
 def confirm(token):
@@ -64,19 +73,6 @@ def confirm(token):
     else:
         flash('Invalid link confirmation or expires link ', 'info')
     return redirect(url_for('user.unconfirmed'))
-
-
-@user.before_app_request
-def before_request():
-    if current_user.is_authenticated and not current_user.confirmed and request.endpoint[:5] != 'user.':
-        return redirect(url_for('user.unconfirmed'))
-
-
-@user.before_app_request
-def after_access_page():
-    if current_user.is_authenticated and not current_user.username and request.endpoint[:5] != 'page.':
-        flash("Choose a username to continue our services.", 'success')
-        return redirect(url_for('user.welcome'))
 
 
 @user.route('/unconfirmed')
@@ -91,7 +87,7 @@ def unconfirmed():
 @login_required
 def resend_link():
     token = current_user.generate_token()
-    send_mail(current_user.email, 'contact', 'user/mail/index', token=token )
+    send_mail(current_user.email, 'contact', 'user/mail/unconfirmed', token=token )
     flash("A new new email with a confirmation has been sent to your email.", 'success')
     return redirect(url_for('page.home'))
 
@@ -106,7 +102,7 @@ def welcome():
         current_user.username = form.username.data 
         db.session.commit()
         flash("Sign up is complete, you can now enjoy our serveices. Thank you.")
-        return redirect(url_for('user.settins'))
+        return redirect(url_for('user.settings'))
     return render_template('user/welcome.html', form=form)
 
 
@@ -132,8 +128,10 @@ def update_credentails():
 
 
 @user.route('/requestpasswordreset', methods=['GET', 'POST'])
-@anonymous_required
 def requestpasswordreset():
+    if current_user.is_authenticated:
+        flash("Operation already performed", 'info')
+        return redirect(url_for('user.settings'))
     form = RequestPasswordResetForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email = form.email.data).first()
@@ -151,13 +149,15 @@ def settings():
 
 
 @user.route('/account/newpassword/<token>', methods=['GET', 'POST'])
-@anonymous_required
 def newpassword(token):
-    token = request.args.get('token')
+    if current_user.is_authenticated:
+        flash("Operation already performed", 'info')
+        return redirect(url_for('user.settings'))
     form = PasswordForm()
     if form.validate_on_submit():
-        if current_user.verify_token(token):
-            current_user.password = form.password.data
+        user = User.query.filter_by(email=form.email.data).first()
+        if user.verify_token(token):
+            user.password = form.password.data
             flash('Your password has been reset successfully.', 'success')
         else:
             flash('Invalid or expire link ', 'info')

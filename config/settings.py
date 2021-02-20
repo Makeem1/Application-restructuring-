@@ -1,6 +1,10 @@
 from datetime import timedelta
+import os
 
 DEBUG = True
+
+basedir = os.path.abspath(os.path.dirname(__file__))
+
 
 # SERVER_NAME = '127.0.0.1:5000'
 
@@ -14,7 +18,7 @@ MAIL_USE_SSL = False
 MAIL_USERNAME = 'patrickpwilliamson9@gmail.com'  # This email is not correct and will be overwritten by instance file
 MAIL_PASSWORD = 'Olayinka1'  # This password is not and will be overwritten by instance settings file
 MAIL_DEFAULT_SENDER = 'patrickpwilliamson9@gmail.com'
-FLASKY_MAIL_SUBJECT_PREFIX = 'Snake Eyes'
+FLASKY_MAIL_SUBJECT_PREFIX = 'Snake Eyes user'
 FLASKY_MAIL_SENDER = 'patrickpwilliamson9@gmail.com'
 
 # Celery configuration 
@@ -26,10 +30,12 @@ CELERY_RESULT_SERIALIZER = 'json' # give the result as json data
 CELERY_REDIS_MAX_CONNECTIONS = 5  # 
 
 
-# Sqlalchemy 
-db_url = 'postgresql://snakeeyes:devpassword@postgress:5432/snakeeyes'
-SQLALCHEMY_DATABASE_URL = db_url
+
+pd_str = 'postgresql://postgres:Olayinka1?@localhost:5432/snakeeyes' 
+# SQLALCHEMY_DATABASE_URI='sqlite:///site.db'
+SQLALCHEMY_DATABASE_URI=pd_str
 SQLALCHEMY_TRACK_MODIFICATION = False
+
 
 # User 
 SEED_ADMIN_EMAIL = 'dev@local.host'

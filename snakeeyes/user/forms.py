@@ -6,7 +6,7 @@ from snakeeyes.user.models import User
 
 
 class LoginForm(Form):
-    email = StringField('Email', validators=[DataRequired(), Length(min=5, max=35, message="Your password must be 8-32 character long")])])
+    email = StringField('Email', validators=[DataRequired(), Length(min=5, max=35, message="Your password must be 8-32 character long")])
     password = PasswordField('Password', validators=[DataRequired(), Length(min=8, max=32)])
     remember_me = BooleanField('Keep me signed in.')
 
@@ -16,7 +16,13 @@ class RegisterForm(Form):
     password = PasswordField('Password', validators=[DataRequired(), 
                                             Length(min=8, max=32, message="Your password must be 8-32 character long")])
     confirm_password = PasswordField("Confirm password", validators=[DataRequired(), 
-                                            Length(min=8, max=32, message="Your password must be 8-32 character long"), EqualTo(password, message='Your input must match the password field.')])
+                        Length(min=8, max=32, message="Your password must be 8-32 character long"), EqualTo('password', message='Your input must match the password field.')])
+
+    def validate_email(self, email):
+        user= User.query.filter_by(email=email.data).first()
+        if user:
+            raise ValidationError("Email already taken")
+
 
 
 class WelcomeForm(Form):
@@ -37,7 +43,7 @@ class RequestPasswordResetForm(Form):
             raise ValidationError("There's no user with these email, sign up to create an account.")
 
 class NewPasswordForm(Form):
-    password = StringField('Enter a new password', validators=[DataRequired(), Length(min=8, max=32, message="Your password must be 8-32 character long")])])
+    password = StringField('Enter a new password', validators=[DataRequired(), Length(min=8, max=32, message="Your password must be 8-32 character long")])
 
 class UpdateAccountForm(Form):
     email = EmailField("Email", validators=[DataRequired(), Email(), Length(min=5, max=35)])

@@ -4,7 +4,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import UserMixin
 from snakeeyes.extensions import login_manager
 from flask import current_app
-
+from itsdangerous import TimedJSONWebSignatureSerializer
 
 
 @login_manager.user_loader
@@ -15,17 +15,17 @@ def load_user(user_id):
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer(), primary_key=True)
-    username = db.Column(db.String(24), nullable=False, unique=True, server_default='')
-    email = db.Column(db.String(128), nullable=False, unique = True, server_default='')
-    active = db.Column(db.Boolean(), server_default = '1', nullable=False)
-    hash_password = db.Column(db.String(128), nullable=False)
-    confirmed = db.Column(db.Boolean(), server_default='False', nullable=False)
+    username = db.Column(db.String(24), nullable=True, unique=True)
+    email = db.Column(db.String(128), nullable=False, unique = True)
+    active = db.Column(db.Boolean, default = True, nullable=False)
+    hash_password = db.Column(db.String(240), nullable=False)
+    confirmed = db.Column(db.Boolean(), default = False, nullable=False)
 
-    count_sign_in = db.Column(db.Integer(), default = 0)
-    current_sign_in_on = db.Column(db.DateTime(), default=datetime.datetime.utcnow, nullable=False)
-    current_sign_in_ip = db.Column(db.String(24), nullable = False) 
-    last_sign_in_on = db.Column(db.DateTime(), default=datetime.datetime.utcnow, nullable=False)
-    last_sign_in_ip = db.Column(db.String(24), nullable = False) 
+    sign_in_count = db.Column(db.Integer, default=0)
+    current_sign_in_on = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
+    current_sign_in_ip = db.Column(db.String(24)) 
+    last_sign_in_on = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
+    last_sign_in_ip = db.Column(db.String(24)) 
 
 
     @property
@@ -43,11 +43,11 @@ class User(UserMixin, db.Model):
 
 
     def is_active(self):
-        return self.active()
+        return self.active
 
 
     def track_user_activities(self, ip_address):
-        self.count_sign_in = +1
+        self.sign_in_count = +1
 
         self.last_sign_in_on = self.current_sign_in_on
         self.last_sign_in_ip = self.current_sign_in_ip
@@ -59,24 +59,24 @@ class User(UserMixin, db.Model):
 
     
     def generate_token(self, expiration=3600):
-        secret_key = current_app.config['SECRET_KEY']
-        s = JSONWebSignatureSerializer("secret-key", expires_in= expiration)
+        s = TimedJSONWebSignatureSerializer('current_app.config["SECRET_KEY"]', expires_in=expiration)
         return s.dumps({"user_id": self.id})
 
+
     def verify_token(self, token):
-        s = JSONWebSignatureSerializer(current_app.config['SECRET_KEY'])
+        s = TimedJSONWebSignatureSerializer(current_app.config['SECRET_KEY'])
         try:
             data = s.loads(token)
         except:
             return False
 
-        if data.get('user_id') != self.email:
+        if data.get('user_id') != self.id:
             self.confirmed = False
         self.confirmed = True
         db.session.commit()
-        return True
+        return User.query.get(data['user_id'])
 
-    def create_table():
+    def create_table(self):
         db.drop_all()
         db.create_all()
 

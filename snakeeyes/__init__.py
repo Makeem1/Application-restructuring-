@@ -6,6 +6,10 @@ from snakeeyes.page import page
 from snakeeyes.user import user
 from snakeeyes.extensions import Csrf, mail, debug_toolbar, db, login_manager
 
+login_manager.login_view = 'user.login'
+login_manager.login_message = 'You need to login to access this page'
+login_manager.login_message_category = 'info'
+login_manager.session_protection = 'strong'
 
 
 def create_app(override_settings=None):

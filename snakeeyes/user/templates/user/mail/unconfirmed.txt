@@ -1,0 +1,10 @@
+Hi ,
+
+Click the link below to verify your account:
+
+{{ url_for('user.confirm', token=token, _external=True) }}
+
+
+
+Thanks,
+Snake Eyes
