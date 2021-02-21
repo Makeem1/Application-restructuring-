@@ -14,13 +14,17 @@ def load_user(user_id):
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True)
+    # Unique idntification number
+    id = db.Column(db.Integer, primary_key = True)
+
+    # User credentials
     username = db.Column(db.String(24), nullable=True, unique=True)
     email = db.Column(db.String(128), nullable=False, unique = True)
     active = db.Column(db.Boolean, default = True, nullable=False)
     hash_password = db.Column(db.String(240), nullable=False)
-    confirmed = db.Column(db.Boolean(), default = False)
+    confirmed = db.Column(db.Boolean, default = False)
 
+    # User tracking information 
     sign_in_count = db.Column(db.Integer, default=0)
     current_sign_in_on = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
     current_sign_in_ip = db.Column(db.String(24)) 
@@ -59,8 +63,8 @@ class User(UserMixin, db.Model):
 
     
     def generate_token(self, expiration=3600):
-        s = TimedJSONWebSignatureSerializer('current_app.config["SECRET_KEY"]', expires_in=expiration)
-        return s.dumps({"user_id": self.id})
+        s = TimedJSONWebSignatureSerializer(current_app.config["SECRET_KEY"],  expires_in=expiration)
+        return s.dumps({"confirm": self.id}).decode('utf-8')
 
 
     def verify_token(self,token):
@@ -70,7 +74,7 @@ class User(UserMixin, db.Model):
         except:
             return False
 
-        if data.get('user_id') != self.id:
+        if data.get('confirm') != self.id:
             return False
         self.confirmed = True
         db.session.add(self)
