@@ -26,12 +26,12 @@ def register():
 def login():
     if current_user.is_authenticated:
         flash("Operation already performed", 'info')
-        return redirect(url_for('user.settings'))
+        return redirect(url_for('page.home'))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user is not None and user.verify_password(form.password.data):
-            if login_user(user, remember=form.remember_me.data) and user.is_active():
+            if login_user(user, remember=True) and user.is_active():
                 flash('Log in successful', 'success')
                 user.track_user_activities(request.remote_addr)
                 next_page = request.args.get('next')
@@ -58,24 +58,24 @@ def logout():
 
 
 @user.route('/confirm/<token>')
+@login_required
 def confirm(token):
     if current_user.confirmed:
         return redirect(url_for('page.home'))
     if current_user.verify_token(token):
-        flash("Your account has been confirmed", 'success')
+        flash("Your account has been verified", 'success')
     else:
         flash('The confirmation link has expired or invalid', 'danger')
     return redirect(url_for('page.home'))
 
 
-# @user.before_app_request
-# def before_request():
-#     if current_user.is_authenticated and not current_user.confirmed and request.endpoint != 'user.':
-#         return redirect(url_for('user.unconfirmed'))
+@user.before_app_request
+def before_request():
+    if current_user.is_authenticated and not current_user.confirmed and request.endpoint[:5] != 'user.':
+        return redirect(url_for('user.unconfirmed'))
 
 
 @user.route('/unconfirmed')
-@login_required
 def unconfirmed():
     if current_user.is_anonymous or current_user.confirmed:
         return redirect(url_for('page.home'))
@@ -86,7 +86,7 @@ def unconfirmed():
 @login_required
 def resend_link():
     token = current_user.generate_token()
-    send_mail(current_user.email, 'contact', 'user/mail/unconfirmed', token=token )
+    send_mail(current_user.email, 'contact', 'user/mail/unconfirmed', user = current_user, token=token )
     flash("A new new email with a confirmation has been sent to your email.", 'success')
     return redirect(url_for('page.home'))
 
@@ -134,7 +134,7 @@ def requestpasswordreset():
     form = RequestPasswordResetForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email = form.email.data).first()
-        token = user.generate_token()
+        token = user.generate_reset_token()
         send_mail(user, 'contact', 'user/mail/index', token=token )
         flash('Password reset link had been sent to your email', 'success')
         return redirect(url_for('user.login'))
@@ -152,16 +152,19 @@ def newpassword(token):
     if current_user.is_authenticated:
         flash("Operation already performed", 'info')
         return redirect(url_for('user.settings'))
+        
     form = PasswordForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        if user.verify_token(token):
+        if user.confirm_reset_token(token):
             user.password = form.password.data
             flash('Your password has been reset successfully.', 'success')
         else:
             flash('Invalid or expire link ', 'info')
             return redirect(url_for('user.login'))
     return render_template('user/newpassword.html', form=form)
+
+
 
     
 

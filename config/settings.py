@@ -34,7 +34,8 @@ CELERY_REDIS_MAX_CONNECTIONS = 5  #
 pd_str = 'postgresql://postgres:Olayinka1?@localhost:5432/snakeeyes' 
 # SQLALCHEMY_DATABASE_URI='sqlite:///site.db'
 SQLALCHEMY_DATABASE_URI=pd_str
-SQLALCHEMY_TRACK_MODIFICATION = False
+SQLALCHEMY_TRACK_MODIFICATIONS = False
+SQLALCHEMY_COMMIT_ON_TEARDOWN = True
 
 
 # User 

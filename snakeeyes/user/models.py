@@ -9,17 +9,17 @@ from itsdangerous import TimedJSONWebSignatureSerializer
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return User.query.get(user_id)
 
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
-    id = db.Column(db.Integer(), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(24), nullable=True, unique=True)
     email = db.Column(db.String(128), nullable=False, unique = True)
     active = db.Column(db.Boolean, default = True, nullable=False)
     hash_password = db.Column(db.String(240), nullable=False)
-    confirmed = db.Column(db.Boolean(), default = False, nullable=False)
+    confirmed = db.Column(db.Boolean(), default = False)
 
     sign_in_count = db.Column(db.Integer, default=0)
     current_sign_in_on = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
@@ -53,7 +53,7 @@ class User(UserMixin, db.Model):
         self.last_sign_in_ip = self.current_sign_in_ip
 
         self.current_sign_in_ip = ip_address
-        self.current_sign_in_on = datetime.datetime.utcnow
+        self.current_sign_in_on = datetime.datetime.utcnow()
 
         return True
 
@@ -63,7 +63,7 @@ class User(UserMixin, db.Model):
         return s.dumps({"user_id": self.id})
 
 
-    def verify_token(self, token):
+    def verify_token(self,token):
         s = TimedJSONWebSignatureSerializer(current_app.config['SECRET_KEY'])
         try:
             data = s.loads(token)
@@ -71,10 +71,27 @@ class User(UserMixin, db.Model):
             return False
 
         if data.get('user_id') != self.id:
-            self.confirmed = False
+            return False
         self.confirmed = True
-        db.session.commit()
-        return User.query.get(data['user_id'])
+        db.session.add(self)
+        return True
+
+
+    def generate_reset_token(self):
+        s = TimedJSONWebSignatureSerializer(current_app.config['SECRET_KEY'])
+        return s.dumps({'user_id': self.user.id})
+
+    @staticmethod
+    def confirm_reset_token(token):
+        s = TimedJSONWebSignatureSerializer(current_app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token)
+        except:
+            return False
+
+        user = User.query.get(data.get('user_id'))
+
+        return user
 
 
         

@@ -1,4 +1,4 @@
-Hi ,
+Hi {{user.email}}, in order to continue using our services, you need to verify your email address. 
 
 Click the link below to verify your account:
 
