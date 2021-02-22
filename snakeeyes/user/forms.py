@@ -38,12 +38,13 @@ class RequestPasswordResetForm(Form):
     email = EmailField("Email", validators=[DataRequired(), Email(), Length(min=5, max=35)])
 
     def validate_email(self, email):
-        user = User.query.filter_by(username=email.data).first()
+        user = User.query.filter_by(email=email.data).first()
         if user is None:
             raise ValidationError("There's no user with these email, sign up to create an account.")
 
 class NewPasswordForm(Form):
     password = StringField('Enter a new password', validators=[DataRequired(), Length(min=8, max=32, message="Your password must be 8-32 character long")])
+    confirm_password = StringField('Confirm password', validators=[DataRequired(), Length(min=8, max=32, message="Your password must be 8-32 character long") , EqualTo('password', message='Your input must match the password field.')])
 
 class UpdateAccountForm(Form):
     email = EmailField("Email", validators=[DataRequired(), Email(), Length(min=5, max=35)])

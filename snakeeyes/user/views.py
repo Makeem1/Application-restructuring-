@@ -126,20 +126,6 @@ def update_credentails():
     return render_template('user/updatecredentials.html', form = form)
 
 
-@user.route('/requestpasswordreset', methods=['GET', 'POST'])
-def requestpasswordreset():
-    if current_user.is_authenticated:
-        flash("Operation already performed", 'info')
-        return redirect(url_for('user.settings'))
-    form = RequestPasswordResetForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(email = form.email.data).first()
-        token = user.generate_reset_token()
-        send_mail(user, 'contact', 'user/mail/index', token=token )
-        flash('Password reset link had been sent to your email', 'success')
-        return redirect(url_for('user.login'))
-    return render_template('user/requestpasswordreset.html', form = form)
-
 
 @user.route('/settings')
 @login_required
@@ -147,21 +133,41 @@ def settings():
     return render_template('user/settings.html')
 
 
-@user.route('/account/newpassword/<token>', methods=['GET', 'POST'])
+@user.route('/requestpasswordreset', methods=['GET', 'POST'])
+def requestpasswordreset():
+    if current_user.is_authenticated:
+        flash("Operation already performed", 'info')
+        return redirect(url_for('page.home'))
+    form = RequestPasswordResetForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email = form.email.data).first()
+        token = user.generate_reset_token()
+        send_mail(user.email, 'reset password token', 'user/mail/reset_password', user = user, token=token )
+        flash('Password reset link had been sent to your email', 'success')
+        return redirect(url_for('user.login'))
+    return render_template('user/requestpasswordreset.html', form = form)
+
+
+
+
+@user.route('/new_password/<token>', methods=['GET', 'POST'])
 def newpassword(token):
     if current_user.is_authenticated:
         flash("Operation already performed", 'info')
-        return redirect(url_for('user.settings'))
-        
-    form = PasswordForm()
+        return redirect(url_for('page.home'))
+      
+    form = NewPasswordForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
-        if user.confirm_reset_token(token):
-            user.password = form.password.data
-            flash('Your password has been reset successfully.', 'success')
-        else:
-            flash('Invalid or expire link ', 'info')
-            return redirect(url_for('user.login'))
+        user = User.confirm_reset_token(token)
+        if user is None:
+            flash('Your reset token has expired or invalid', 'danger')
+            return redirect(url_for('user.requestpasswordreset'))
+
+        user.password = form.password.data
+        db.session.add(user)
+        db.session.commit()
+        flash('Your password has been reset successfully.', 'success')
+        return redirect(url_for('user.login'))
     return render_template('user/newpassword.html', form=form)
 
 

@@ -83,7 +83,7 @@ class User(UserMixin, db.Model):
 
     def generate_reset_token(self):
         s = TimedJSONWebSignatureSerializer(current_app.config['SECRET_KEY'])
-        return s.dumps({'user_id': self.user.id})
+        return s.dumps({'user_id': self.id})
 
     @staticmethod
     def confirm_reset_token(token):
@@ -95,7 +95,7 @@ class User(UserMixin, db.Model):
 
         user = User.query.get(data.get('user_id'))
 
-        return user
+        return user.id
 
 
         
