@@ -5,7 +5,7 @@ from flask_login import UserMixin
 from snakeeyes.extensions import login_manager
 from flask import current_app
 from itsdangerous import TimedJSONWebSignatureSerializer
-
+from collections import OrderedDict
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -14,10 +14,17 @@ def load_user(user_id):
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
+
+    ROLE = OrderedDict([
+        ('member', "Member"),
+        ("admin", "Admin")
+    ])
+    
     # Unique idntification number
     id = db.Column(db.Integer, primary_key = True)
 
     # User credentials
+    role = db.Column(db.Enum(*ROLE, name = 'role_type', native_enum = False), nullable = False, default='member')
     username = db.Column(db.String(24), nullable=True, unique=True)
     email = db.Column(db.String(128), nullable=False, unique = True)
     active = db.Column(db.Boolean, default = True, nullable=False)

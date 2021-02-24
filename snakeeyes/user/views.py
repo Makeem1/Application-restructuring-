@@ -1,7 +1,7 @@
 from flask import flash, request, url_for, render_template, redirect
 from snakeeyes.user.forms import LoginForm, RegisterForm, WelcomeForm, RequestPasswordResetForm, NewPasswordForm, UpdateAccountForm, PasswordField
 from snakeeyes.user import user
-from flask_login import login_user, logout_user, login_required, current_user 
+from flask_login import login_user, logout_user, login_required, current_user, confirm_login
 from snakeeyes.user.user_utils import safe_url
 from snakeeyes.user.models import User
 from snakeeyes.email import send_mail
@@ -56,7 +56,6 @@ def logout():
     return redirect(url_for('user.login'))
 
 
-
 @user.route('/confirm/<token>')
 @login_required
 def confirm(token):
@@ -105,7 +104,6 @@ def welcome():
     return render_template('user/welcome.html', form=form)
 
 
-
 @user.route('/updateaccount', methods=['GET', 'POST'])
 @login_required
 def update_credentails():
@@ -124,7 +122,6 @@ def update_credentails():
         else:
             flash("Your credentials has been updated", 'Thanks')
     return render_template('user/updatecredentials.html', form = form)
-
 
 
 @user.route('/settings')
@@ -146,8 +143,6 @@ def requestpasswordreset():
         flash('Password reset link had been sent to your email', 'success')
         return redirect(url_for('user.login'))
     return render_template('user/requestpasswordreset.html', form = form)
-
-
 
 
 @user.route('/new_password/<token>', methods=['GET', 'POST'])

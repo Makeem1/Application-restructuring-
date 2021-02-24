@@ -10,7 +10,9 @@ login_manager.login_view = 'user.login'
 login_manager.login_message = 'You need to login to access this page'
 login_manager.login_message_category = 'info'
 login_manager.session_protection = 'strong'
-
+login_manager.refresh_view = 'user.login'
+login_manager.needs_refresh_message = "To protect your account, please reauthenticate to access this page."
+login_manager.needs_refresh_message_category = "info"
 
 def create_app(override_settings=None):
     """
