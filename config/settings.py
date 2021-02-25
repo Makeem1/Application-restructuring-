@@ -9,6 +9,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 SERVER_NAME = '127.0.0.1:5000'
 
 SECRET_KEY = 'hellowrodjkadyggcwffkuwhneuedxkewhig'
+WTF_CSRF_ENABLED = False
 
 # Email Configuration settings
 MAIL_SERVER = 'smtp.gmail.com'
@@ -31,9 +32,9 @@ CELERY_REDIS_MAX_CONNECTIONS = 5  #
 
 
 
-pd_str = 'postgresql://postgres:Olayinka1?@localhost:5432/snakeeyes' 
+db_uri = 'postgresql://postgres:Olayinka1?@localhost:5432/snakeeyes' 
 # SQLALCHEMY_DATABASE_URI='sqlite:///site.db'
-SQLALCHEMY_DATABASE_URI=pd_str
+SQLALCHEMY_DATABASE_URI=db_uri
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 SQLALCHEMY_COMMIT_ON_TEARDOWN = True
 
