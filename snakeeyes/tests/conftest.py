@@ -9,12 +9,11 @@ from snakeeyes.user.models import User
 @pytest.fixture(scope = 'session')
 def app(override_settings=None):
     # Creating an app instamce for db
-    db_uri = '{0}_test'.format(settings.SQLALCHEMY_DATABASE_URI)
     param = {
         'DEBUG' : False,
         'TESTING' : True,
         'WTF_CSRF_ENABLED': False,
-        'SQLALCHEMY_DATABASE_URI': db_uri
+        'SQLALCHEMY_DATABASE_URI': 'postgresql://postgres:Olayinka1?@localhost:5432/snakeeyes_test' 
     }
 
     _app = create_app(override_settings=param)
@@ -40,7 +39,7 @@ def client(app):
     return app.test_client()
 
 
-pytest.fixture(scope='session')
+@pytest.fixture(scope='session')
 def db(app):
     """Creating a database instance"""
     _db.drop_all()
@@ -71,8 +70,14 @@ def session(db):
 @pytest.fixture(scope='session')
 def token(db):
     """creating a token test"""
-    user = User.find_by_identity('admin@local.host')
-    return user.serialize_token()
+    user = User.query.filter_by(email = 'admin@local.host').first()
+    return user.generate_token()
+
+@pytest.fixture(scope='session')
+def token_reset(db):
+    """creating a token test"""
+    user = User.query.filter_by(email = 'admin@local.host').first()
+    return user.generate_reset_token()
 
 
 @pytest.fixture(scope='function')
