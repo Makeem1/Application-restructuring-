@@ -138,10 +138,14 @@ def requestpasswordreset():
     form = RequestPasswordResetForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email = form.email.data).first()
-        token = user.generate_reset_token()
-        send_mail(user.email, 'reset password token', 'user/mail/reset_password', user = user, token=token )
-        flash('Password reset link had been sent to your email', 'success')
-        return redirect(url_for('user.login'))
+        if user:
+            token = user.generate_reset_token()
+            send_mail(user.email, 'reset password token', 'user/mail/reset_password', user = user, token=token )
+            flash('Password reset link had been sent to your email', 'success')
+            return redirect(url_for('user.login'))
+        else:
+            flash('Unable to find your account', 'warning')
+            return redirect(url_for('user.requestpasswordreset'))
     return render_template('user/requestpasswordreset.html', form = form)
 
 

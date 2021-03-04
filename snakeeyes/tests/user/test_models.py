@@ -1,5 +1,6 @@
 from snakeeyes.user.models import User
 
+
 class TestUserToken:
     """Testing for token generation and verifictaion"""
     def test_count_token(self, token):
@@ -12,10 +13,12 @@ class TestUserToken:
         user = User.query.filter_by(email = 'admin@local.host').first()
         assert user.verify_token(token) == 'admin@local.host'
 
+
     def test_confirm_reset_token(self,token_reset):
         user = User.confirm_reset_token(token_reset)
         assert user == 1
         
+
     def test_fail_token(self, token):
         user = User.query.filter_by(email = 'admin@local.host').first()
         u = user.verify_token("{0}123".format(token))
