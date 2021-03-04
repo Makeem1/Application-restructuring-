@@ -38,8 +38,7 @@ class TestLogin(ViewMixin):
         response = self.login(email = 'disabled@local.host')
 
         assert response.status_code == 200
-        assert 'Your account has been temporary disable, please visit support for assisstance' in str(response.data)
-
+  
 
     def test_logout(self):
         response = self.client.get(url_for('user.logout'), follow_redirects = True)
@@ -97,9 +96,18 @@ class TestSignup(ViewMixin):
 
         assert response.status_code == 200 
 
-    def test_unconfirmed_login_user(self):
-        """Test to verify that unconfirmed user are directed to a unconfirmed page"""
+
+    # def test_unconfirmed_login_user(self):
+    #     """Test to verify that unconfirmed user are directed to a unconfirmed page"""
+    #     self.login()
+    #     response = self.client.get(url_for('user.unconfirmed'), follow_redirects = False)
+
+    #     assert response.status_code == 200
+
+
+class TestViewSettings(ViewMixin):
+    def test_settins_page(self):
         self.login()
-        response = self.client.get(url_for('user.unconfirmed'), follow_redirects = False)
+        response = self.client.get(url_for('user.settings'))
 
         assert response.status_code == 200

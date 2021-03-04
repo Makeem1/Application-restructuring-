@@ -41,6 +41,7 @@ def login():
                     return redirect(url_for('page.home'))
             else:
                 flash("Your account has been temporary disable, please visit support for assisstance", 'info')
+                return redirect(url_for('user.login'))
         elif user is None:
             flash("You need to register in order to access this page", 'info')
         else:
