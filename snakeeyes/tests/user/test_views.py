@@ -97,12 +97,12 @@ class TestSignup(ViewMixin):
         assert response.status_code == 200 
 
 
-    # def test_unconfirmed_login_user(self):
-    #     """Test to verify that unconfirmed user are directed to a unconfirmed page"""
-    #     self.login()
-    #     response = self.client.get(url_for('user.unconfirmed'), follow_redirects = False)
+    def test_unconfirmed_login_user(self):
+        """Test to verify that unconfirmed user are directed to a unconfirmed page"""
+        self.login()
+        response = self.client.get(url_for('user.unconfirmed'), follow_redirects = False)
 
-    #     assert response.status_code == 200
+        assert response.status_code == 200
 
 
 class TestViewSettings(ViewMixin):

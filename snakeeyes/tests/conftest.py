@@ -5,7 +5,6 @@ from snakeeyes.extensions import db as _db
 from snakeeyes.user.models import User
 
 
-
 @pytest.fixture(scope = 'session')
 def app(override_settings=None):
     # Creating an app instamce for db
