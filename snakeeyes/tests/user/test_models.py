@@ -10,7 +10,7 @@ class TestUserToken:
     def test_confirm_token(self, token):
         """Recover the email email in dump in the token """
         user = User.query.filter_by(email = 'admin@local.host').first()
-        assert user.verify_token(token) == 1
+        assert user.verify_token(token) == 'admin@local.host'
 
     def test_confirm_reset_token(self,token_reset):
         user = User.confirm_reset_token(token_reset)
@@ -20,3 +20,20 @@ class TestUserToken:
         user = User.query.filter_by(email = 'admin@local.host').first()
         u = user.verify_token("{0}123".format(token))
         assert u is False
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        

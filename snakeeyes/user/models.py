@@ -85,7 +85,8 @@ class User(UserMixin, db.Model):
             return False
         self.confirmed = True
         db.session.add(self)
-        return True
+        user = User.query.filter_by(id = data.get('confirm')).first()
+        return user.email
 
 
     def generate_reset_token(self):

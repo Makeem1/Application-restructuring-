@@ -20,7 +20,6 @@ class TestContact:
         assert response.status_code == 200
         assert "You will get a response soon" in str(response.data)
 
-
     def test_deliver_support_email(self):
         """ Deliver a contact email. """
         form = {
@@ -33,7 +32,7 @@ class TestContact:
                 form.get('message'), 'contact', 'contact/mail/index', data = form )
 
             assert len(outbox) == 1
-            assert form.get('email') in outbox[0].body
+            assert form.get('message') in outbox[0].body
 
 
 

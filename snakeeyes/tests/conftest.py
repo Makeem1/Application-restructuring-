@@ -59,12 +59,18 @@ def db(app):
     return _db
 
 
+# @pytest.fixture(scope='function')
+# def session(db):
+#     """Creating a function for faster test"""
+#     db.session.begin_nexted()
+#     yield db.session
+#     db.session.rollback() 
+
 @pytest.fixture(scope='function')
 def session(db):
-    """Creating a function for faster test"""
-    db.session.begin_nexted()
+    db.session.begin_nested()
     yield db.session
-    db.session.rollback() 
+    db.session.rollback()
 
 
 @pytest.fixture(scope='session')
