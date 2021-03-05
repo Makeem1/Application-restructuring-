@@ -1,6 +1,7 @@
 from functools import wraps
 from flask_login import current_user
 from flask import flash 
+from flask import redirect
 
 
 def role_required(*roles):
