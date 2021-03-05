@@ -4,6 +4,7 @@ from flask import Flask
 from snakeeyes.contact import contact
 from snakeeyes.page import page 
 from snakeeyes.user import user
+from snakeeyes.admin import admin 
 from snakeeyes.extensions import Csrf, mail, debug_toolbar, db, login_manager
 
 login_manager.login_view = 'user.login'
@@ -32,6 +33,7 @@ def create_app(override_settings=None):
     app.register_blueprint(contact)
     app.register_blueprint(page)
     app.register_blueprint(user)
+    app.register_blueprint(admin)
 
     extension(app)
 

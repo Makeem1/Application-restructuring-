@@ -40,17 +40,28 @@ class TestLogin(ViewMixin):
         assert response.status_code == 200
   
 
+    def logout(self):
+        assert self.login().status_code == 200
+        assert 'successful' in str(self.login().data)
+        response = self.logout()
+        assert response.status_code == 200
+        assert 'You are logged out' in str(response.data)
+
+
     def test_logout(self):
+        self.login()
         response = self.client.get(url_for('user.logout'), follow_redirects = True)
 
         assert response.status_code == 200
+        assert 'You' in str(response.data)
         
 
 class TestPasswordReset(ViewMixin):
     def test_begin_password_reset(self):
-        response = self.client.get(url_for('user.requestpasswordreset'))
+        response = self.client.get(url_for('user.requestpasswordreset'), follow_redirects = True)
 
         assert response.status_code == 200
+        assert 'Password ' not in str(response.data)
 
 
     def test_begin_password_as_logded_in(self):
@@ -95,14 +106,6 @@ class TestSignup(ViewMixin):
         response = self.client.post(url_for('user.register') , data = user, follow_redirects = True )
 
         assert response.status_code == 200 
-
-
-    def test_unconfirmed_login_user(self):
-        """Test to verify that unconfirmed user are directed to a unconfirmed page"""
-        self.login()
-        response = self.client.get(url_for('user.unconfirmed'), follow_redirects = False)
-
-        assert response.status_code == 200
 
 
 class TestViewSettings(ViewMixin):
