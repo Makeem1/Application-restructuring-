@@ -38,6 +38,11 @@ class User(UserMixin, db.Model):
     last_sign_in_on = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
     last_sign_in_ip = db.Column(db.String(24)) 
 
+    # User run time
+    created_on = db.Column(db.DateTime(), default = datetime.datetime.utcnow)
+    updated_on = db.Column(db.DateTime(), default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+
+
 
     @property
     def password(self):
@@ -55,6 +60,17 @@ class User(UserMixin, db.Model):
 
     def is_active(self):
         return self.active
+
+
+    @classmethod
+    def sort_by(cls, field, direction):
+        """This help to sort the user base on the field column and direction. """
+
+        if field not in cls.__table__.columns:
+            field = created_on
+        
+        if direction not in ('asc', 'desc'):
+            direction = 'asc'
 
 
     def track_user_activities(self, ip_address):

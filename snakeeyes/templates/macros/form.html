@@ -68,3 +68,15 @@
 
 
 {% endmacro %}
+
+{# Macro render search form searching. #}
+{% macro search(endpoint) %}
+	{% call form_tag(endpoint, method='get') %}
+	<label for="q"></label>
+	<input type="text" class="form-control" name="q" id="q" placeholder="Search by typing, then press enter or search button...">
+	<span class="input-group-addon">
+		<button><i class="fa fa-fw fa-search"></i></button>
+	</span>
+	{% endcall %}
+
+{% endmacro %}
