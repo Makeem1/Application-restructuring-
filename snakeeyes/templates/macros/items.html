@@ -1,0 +1,29 @@
+{# Macro sorting on a specific field #}
+
+{% macro sort(field, title_header = None) %}
+    {% set sort = request.args.get('sort', None) %}
+    {% set direction = request.args.get('direction', 'asc') %}
+    {% set q = request.args.get('q', '') %}
+
+
+    {% if title_header == None %}
+        {% set label = field | title %}
+    {% else %}
+        {% set label = title_header %}
+    {% endif %}
+
+    {% if sort == field and direction = 'asc' %}
+        {% set direction = 'desc%}
+    {% else %}
+        {% set direction = 'asc' %}
+    {% endif %}
+
+    {% if sort == field %}
+        {% set css = direction %}
+    {% else %}
+        {% set css = 'sort' %}
+    {% endif %}
+
+    <a class="{{ css }}" href="{{url_for(request.endpoint, q=q, sort = field, direction = direction, **request.view_args )}}"> {{ label }} </a>
+    
+{% endmacro %}

@@ -6,6 +6,7 @@ from snakeeyes.extensions import login_manager
 from flask import current_app
 from itsdangerous import TimedJSONWebSignatureSerializer
 from collections import OrderedDict
+from sqlalchemy import or_
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -63,6 +64,19 @@ class User(UserMixin, db.Model):
 
 
     @classmethod
+    def search(cls, query):
+        """Help to filter search in the from the database"""
+
+        if not query:
+            return ''
+
+        search_query = '{0}'.format(query)
+        search_chain = (User.email.ilike(search_query), User.username.ilike(query))
+
+        return or_(*search_chain)
+
+
+    @classmethod
     def sort_by(cls, field, direction):
         """This help to sort the user base on the field column and direction. """
 
@@ -71,6 +85,8 @@ class User(UserMixin, db.Model):
         
         if direction not in ('asc', 'desc'):
             direction = 'asc'
+
+        return field, direction
 
 
     def track_user_activities(self, ip_address):
