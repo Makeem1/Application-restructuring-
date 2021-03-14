@@ -1,6 +1,6 @@
 from flask_wtf import Form
-from wtforms import StringField, SelectField, ValidationError, BooleanField
-from wtforms.validators import DataRequired, Optional, Length, SelectField
+from wtforms import StringField, SelectField, ValidationError, BooleanField, SelectField
+from wtforms.validators import DataRequired, Optional, Length
 from snakeeyes.user.models import User
 
 
@@ -20,7 +20,7 @@ class BulkDeleteForm(Form):
 class UserForm(Form):
     Role = [('member', "Member"),
         ("admin", "Admin")]
-    username = StringField('Username', validators=[Optional, Length(min=4, max=28)])
+    username = StringField('Username', validators=[Optional(), Length(min=4, max=28)])
     role = SelectField('Priviledegs', validators=[DataRequired()], choices = Role )
     active = BooleanField("Check to allow user to sign in.")
 

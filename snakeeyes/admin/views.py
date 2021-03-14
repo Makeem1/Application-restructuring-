@@ -43,7 +43,7 @@ def users():
     return render_template('admin/user/index.html', form = form_search , users = paginated_users )
 
 
-@admin.route('users/edit/<int: id>', methods=['GET', 'POST'])
+@admin.route('users/edit/<int:id>', methods=['GET', 'POST'])
 def users_edit(id):
     user = request.args.get(id) 
     form = UserForm(obj=user)

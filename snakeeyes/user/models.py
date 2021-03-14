@@ -65,16 +65,21 @@ class User(UserMixin, db.Model):
 
     @classmethod
     def search(cls, query):
-        """Help to filter search in the from the database"""
+        """
+        Search a resource by 1 or more fields.
 
+        :param query: Search query
+        :type query: str
+        :return: SQLAlchemy filter
+        """
         if not query:
             return ''
 
-        search_query = '{0}'.format(query)
-        search_chain = (User.email.ilike(search_query), User.username.ilike(search_query))
-
+        search_query = '%{0}%'.format(query)
+        search_chain = (User.email.ilike(search_query),
+                        User.username.ilike(search_query))
+                        
         return or_(*search_chain)
-
 
     @classmethod
     def sort_by(cls, field, direction):
@@ -106,16 +111,16 @@ class User(UserMixin, db.Model):
         return Falses
 
 
-        def track_user_activities(self, ip_address):
-            self.sign_in_count = +1
+    def track_user_activities(self, ip_address):
+        self.sign_in_count = +1
 
-            self.last_sign_in_on = self.current_sign_in_on
-            self.last_sign_in_ip = self.current_sign_in_ip
+        self.last_sign_in_on = self.current_sign_in_on
+        self.last_sign_in_ip = self.current_sign_in_ip
 
-            self.current_sign_in_ip = ip_address
-            self.current_sign_in_on = datetime.datetime.utcnow()
+        self.current_sign_in_ip = ip_address
+        self.current_sign_in_on = datetime.datetime.utcnow()
 
-            return True
+        return True
 
     
     def generate_token(self, expiration=3600):
