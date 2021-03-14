@@ -37,6 +37,7 @@ db_uri = 'postgresql://postgres:Olayinka1?@localhost:5432/snakeeyes'
 SQLALCHEMY_DATABASE_URI=db_uri
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 SQLALCHEMY_COMMIT_ON_TEARDOWN = True
+FLASKY_POSTS_PER_PAGE = 50 
 
 
 # User 

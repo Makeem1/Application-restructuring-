@@ -71,7 +71,7 @@ class User(UserMixin, db.Model):
             return ''
 
         search_query = '{0}'.format(query)
-        search_chain = (User.email.ilike(search_query), User.username.ilike(query))
+        search_chain = (User.email.ilike(search_query), User.username.ilike(search_query))
 
         return or_(*search_chain)
 
@@ -81,24 +81,41 @@ class User(UserMixin, db.Model):
         """This help to sort the user base on the field column and direction. """
 
         if field not in cls.__table__.columns:
-            field = created_on
+            field = "created_on"
         
         if direction not in ('asc', 'desc'):
             direction = 'asc'
 
         return field, direction
 
+    
+    @classmethod
+    def is_last_admin(cls, user, new_role, new_active):
+        """This particular method will help to check if this particular user is the last admin."""
 
-    def track_user_activities(self, ip_address):
-        self.sign_in_count = +1
+        is_changing_role = user.role == 'admin' and new_role != 'admin'
+        is_changing_active = user.active is True and new_role is None
 
-        self.last_sign_in_on = self.current_sign_in_on
-        self.last_sign_in_ip = self.current_sign_in_ip
+        if is_changing_role or is_changing_active :
+            admin_count = User.query.filter(User.role == 'admin').count()
+            active_count = User.query.filter(User.is_active is True).count()
 
-        self.current_sign_in_ip = ip_address
-        self.current_sign_in_on = datetime.datetime.utcnow()
+            if admin_count == 1 or active_count == 1:
+                return True
+                
+        return Falses
 
-        return True
+
+        def track_user_activities(self, ip_address):
+            self.sign_in_count = +1
+
+            self.last_sign_in_on = self.current_sign_in_on
+            self.last_sign_in_ip = self.current_sign_in_ip
+
+            self.current_sign_in_ip = ip_address
+            self.current_sign_in_on = datetime.datetime.utcnow()
+
+            return True
 
     
     def generate_token(self, expiration=3600):

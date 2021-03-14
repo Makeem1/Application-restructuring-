@@ -3,7 +3,7 @@
 {% import 'macros/items.html' as item %}
 {% import 'macros/user.html' as account %}
 
-{% block title  %} Admin - Users {% endblock %}
+{% block title  %} Admin - Users / List {% endblock %}
 
 {% block body %}
     {% f.seach('admin.users') %}
@@ -14,9 +14,7 @@
         {% if request.args.get('q', '') %}
             <p>Try limiting or removing your search terms.</p>
         {% else %}
-            <p>
-                There are no users present, you should <a href="{{url_for('user.register')}}">sign up a user</a>
-            </p>
+            <p>There are no users present, you should <a href="{{url_for('user.register')}}">sign up a user</a>.</p>
         {% endif %}
     
     <!-- {% esle %}

@@ -1,9 +1,9 @@
-from flask import render_template, request
+from flask import render_template, request, current_app, url_for
 from snakeeyes.admin import admin
 from flask_login import login_required
 from snakeeyes.admin.decorators import role_required
 from snakeeyes.admin.models import DashBoard
-from snakeeyes.admin.forms import SearchForm
+from snakeeyes.admin.forms import SearchForm, UserForm
 from sqlalchemy import text
 from snakeeyes.user.models import User
 
@@ -26,16 +26,45 @@ def dashboard():
 @admin.route('/users')
 def users():
     """Fucntion to list all users in the database."""
-    form = SearchForm()
+    form_search = SearchForm()
 
     page = request.args.get('page', 1, type =int )
 
     sort_by = User.sort_by(request.args.get('sort', 'created_on'), 
                                             request.args.get('direction', 'desc'))
 
-    order_value = '{0} {1}'.format(sort_by[0], sort_by[1])
+    order_values = '{0} {1}'.format(sort_by[0], sort_by[1])
 
-    paginated_users = User.query.filter(User.search(request.args.get('q', ''))).order_by(User.role.asc(), text(order_value)).paginate(page, 50, False)
+    paginated_users = User.query \
+        .filter(User.search(request.args.get('q', ''))) \
+        .order_by(User.role.asc(), text(order_values)) \
+        .paginate( page = page , per_page =current_app.config[FLASKY_POSTS_PER_PAGE] , error_out = False )
 
-    return render_template('admin/user/index.html', form = form , users = paginated_users )
-    
+    return render_template('admin/user/index.html', form = form_search , users = paginated_users )
+
+
+@admin.route('users/edit/<int: id>', methods=['GET', 'POST'])
+def users_edit(id):
+    user = request.args.get(id) 
+    form = UserForm(obj=user)
+
+    if form.validate_on_submit():
+        if user.is_last_admin(User, request.args.get('role'), request.args.get('active')):
+            flash("You are the last admin, you can't perform the operation.", 'error')
+            return redirect(url_for('admin.users'))
+
+        form.populate_obj(user)
+
+        if not user.username:
+            user.username = None
+        
+        user.save()
+        if user.username:
+            flash(f"{user.username} has been saved successfully", 'success')
+        else:
+            flash('User has been saved successfully', 'success')
+            return redirect(url_for('admin.users'))
+
+    return render_template('admin/user/edit.html', form = form , user = user )
+
+
