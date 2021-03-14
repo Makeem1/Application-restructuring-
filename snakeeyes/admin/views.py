@@ -32,13 +32,12 @@ def users():
 
     sort_by = User.sort_by(request.args.get('sort', 'created_on'), 
                                             request.args.get('direction', 'desc'))
-
     order_values = '{0} {1}'.format(sort_by[0], sort_by[1])
 
     paginated_users = User.query \
         .filter(User.search(request.args.get('q', ''))) \
         .order_by(User.role.asc(), text(order_values)) \
-        .paginate( page = page , per_page =current_app.config[FLASKY_POSTS_PER_PAGE] , error_out = False )
+        .paginate( page = page , per_page =current_app.config['FLASKY_POSTS_PER_PAGE'] , error_out = False )
 
     return render_template('admin/user/index.html', form = form_search , users = paginated_users )
 
@@ -53,17 +52,27 @@ def users_edit(id):
             flash("You are the last admin, you can't perform the operation.", 'error')
             return redirect(url_for('admin.users'))
 
-        form.populate_obj(user)
-
+        user.username = form.username.data
+        user.email = form.email.data
+        user.active = form.active.data
+        user.role = form.role.data
+    
         if not user.username:
             user.username = None
         
-        user.save()
+        db.session.commit()
+
         if user.username:
             flash(f"{user.username} has been saved successfully", 'success')
         else:
             flash('User has been saved successfully', 'success')
             return redirect(url_for('admin.users'))
+    
+    form.username.data = user.username
+    form.email.data = user.email
+    form.active.data = user.active
+    form.role.data = user.role
+
 
     return render_template('admin/user/edit.html', form = form , user = user )
 
