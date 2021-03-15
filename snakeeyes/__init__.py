@@ -1,10 +1,10 @@
 from flask import Flask
 
 
-from snakeeyes.contact import contact
-from snakeeyes.page import page 
-from snakeeyes.user import user
-from snakeeyes.admin import admin 
+from snakeeyes.blueprints.contact import contact
+from snakeeyes.blueprints.page import page 
+from snakeeyes.blueprints.user import user
+from snakeeyes.blueprints.admin import admin 
 from snakeeyes.extensions import Csrf, mail, debug_toolbar, db, login_manager
 
 login_manager.login_view = 'user.login'

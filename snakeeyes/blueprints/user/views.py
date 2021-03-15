@@ -1,9 +1,9 @@
 from flask import flash, request, url_for, render_template, redirect
-from snakeeyes.user.forms import LoginForm, RegisterForm, WelcomeForm, RequestPasswordResetForm, NewPasswordForm, UpdateAccountForm, PasswordField
-from snakeeyes.user import user
+from snakeeyes.blueprints.user.forms import LoginForm, RegisterForm, WelcomeForm, RequestPasswordResetForm, NewPasswordForm, UpdateAccountForm, PasswordField
+from snakeeyes.blueprints.user import user
 from flask_login import login_user, logout_user, login_required, current_user, confirm_login
-from snakeeyes.user.user_utils import safe_url
-from snakeeyes.user.models import User
+from snakeeyes.blueprints.user.user_utils import safe_url
+from snakeeyes.blueprints.user.models import User
 from snakeeyes.email import send_mail
 from snakeeyes.extensions import db
 

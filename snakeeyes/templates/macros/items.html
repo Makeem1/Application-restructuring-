@@ -33,7 +33,7 @@
 
 {# Paginate through a resource. #}
 
-{% macro paginate(resources) %}
+{% macro paginate(resource) %}
   {% set args = request.args.to_dict() %}
 
   <ul class="pagination">

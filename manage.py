@@ -1,6 +1,6 @@
 from snakeeyes import create_app
 from flask_script import Manager, Shell
-from snakeeyes.user.models import User
+from snakeeyes.blueprints.user.models import User
 from snakeeyes.extensions import db
 
 

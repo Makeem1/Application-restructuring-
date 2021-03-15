@@ -1,7 +1,7 @@
 from flask_wtf import Form
 from wtforms import StringField, SelectField, ValidationError, BooleanField, SelectField
 from wtforms.validators import DataRequired, Optional, Length
-from snakeeyes.user.models import User
+from snakeeyes.blueprints.user.models import User
 
 
 class SearchForm(Form):
@@ -25,7 +25,7 @@ class UserForm(Form):
     active = BooleanField("Check to allow user to sign in.")
 
     def validate_username(self, username):
-        user = User.query.filter_by(username = user.usemane ).first()
+        user = User.query.filter_by(username=username.data ).first()
 
         if user :
             raise ValidationError("Username already taken by another user, please choose another username. Thanks")

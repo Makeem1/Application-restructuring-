@@ -1,5 +1,5 @@
 from snakeeyes.extensions import db 
-from snakeeyes.user.models import User
+from snakeeyes.blueprints.user.models import User
 from sqlalchemy import func 
 
 

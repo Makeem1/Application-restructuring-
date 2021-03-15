@@ -2,9 +2,9 @@ from flask import render_template, url_for, flash, redirect, request
 
 
 
-from snakeeyes.contact.forms import ContactForm
+from snakeeyes.blueprints.contact.forms import ContactForm
 from flask_login import current_user
-from snakeeyes.contact import contact
+from snakeeyes.blueprints.contact import contact
 from snakeeyes.email import contact_me 
 
 

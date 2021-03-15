@@ -1,6 +1,6 @@
 from flask import render_template
 
-from snakeeyes.page import page 
+from snakeeyes.blueprints.page import page 
 
 @page.route('/')
 def home():

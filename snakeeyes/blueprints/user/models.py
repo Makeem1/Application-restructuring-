@@ -108,7 +108,31 @@ class User(UserMixin, db.Model):
             if admin_count == 1 or active_count == 1:
                 return True
                 
-        return Falses
+        return False
+
+
+    @classmethod
+    def get_bulk_action_id(cls, scope, ids, omit_id=None, q=''):
+        """Determine bulk of id to be deleted."""
+        omit_id = list(map(str, omit_id))
+
+        if scope == 'all_search_result':
+            ids = User.query.with_entities(User.id).filter(User.search(query))
+
+            ids = [str(item[0]) for item in ids]
+
+        if omit_ids:
+            ids = [id for id in ids if id not in omit_id]
+
+        return ids
+
+    @classmethod
+    def bulk_delete(cls, ids):
+        """Delete selected user id"""
+
+        delete_count = User.query.filter(User.id.in_(ids)).delete(synchronize_session=False)
+
+        return delete_count
 
 
     def track_user_activities(self, ip_address):

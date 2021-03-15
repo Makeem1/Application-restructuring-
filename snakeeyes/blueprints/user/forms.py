@@ -2,7 +2,7 @@ from flask_wtf import Form
 from wtforms import StringField, PasswordField, BooleanField
 from wtforms.validators import DataRequired, Length, EqualTo, ValidationError, Optional
 from wtforms_components import EmailField, Email
-from snakeeyes.user.models import User
+from snakeeyes.blueprints.user.models import User
 
 
 class LoginForm(Form):

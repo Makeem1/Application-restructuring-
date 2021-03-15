@@ -1,4 +1,4 @@
-{% import 'macros/_form.html' as f with context %}
+{% import 'macros/form.html' as f with context %}
 
 {% if request.endpoint.endswith('new') %}
   {% set endpoint = 'admin.users_new' %}
@@ -13,7 +13,7 @@
 {% endif %}
 
 <div class="row">
-  <div class="col-md-5 well">
+  <div class="col-6  col-md-5 well">
     {% call f.form_tag(endpoint, **form_kwargs) %}
       <legend>{{ legend }}</legend>
       <div class="form-group">
@@ -43,12 +43,12 @@
 
       <hr/>
       <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-3">
           <button type="submit" class="btn btn-primary btn-block">
             {{ button }}
           </button>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-3">
           <div class="visible-xs visible-sm sm-margin-top"></div>
           <a href="{{ url_for('admin.users') }}"
               class="btn btn-default btn-block">
@@ -58,6 +58,7 @@
       </div>
     {% endcall %}
   </div>
+
   <div class="col-md-5 col-md-push-1 col-md-offset-1">
     <h3>Login activity</h3>
 
