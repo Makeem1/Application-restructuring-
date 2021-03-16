@@ -78,6 +78,10 @@
           </dd>
           <dt>Current sign in IP address</dt>
           <dd class="sm-margin-bottom">{{ user.current_sign_in_ip }}</dd>
+          <dt>Active status</dt>
+          <dd class="sm-margin-bottom">{{ user.active }}</dd>
+          <dt>Confirm status</dt>
+          <dd class="sm-margin-bottom">{{ user.confirmed }}</dd>
           <dt>Previous sign in date</dt>
           <dd class="sm-margin-bottom">
             {% if user.last_sign_in_on %}

@@ -29,50 +29,60 @@
 {% endmacro %}
 
 
-
-
-{# Paginate through a resource. #}
+{# paginate through a resource #}
 
 {% macro paginate(resource) %}
-  {% set args = request.args.to_dict() %}
 
-  <ul class="pagination">
-    <li class="{{ 'disabled' if resource.page == 1 }}">
-      <a href="{{ url_for(request.endpoint, page=1, **args) }}"
-          aria-label="First">
-        &laquo; First
-      </a>
-    </li>
-    <li class="{{ 'disabled' if not resource.has_prev }}">
-      <a href="{{ url_for(request.endpoint, page=resource.page - 1, **args) }}"
-          aria-label="Previous">
-        Prev
-      </a>
-    </li>
-  {%- for page in resource.iter_pages() %}
-    <li class="{{ 'active' if page and page == resource.page }}">
-      {% if page %}
-        {% if page != resource.page %}
-          <a href="{{ url_for(request.endpoint, page=page, **args) }}">{{ page }}</a>
+  <!-- {% set args = request.args.to_dict() %} -->
+    <ul class="pagination">
+      <li class="{{ 'disabled' if resource.page == 1 }}">
+        <a href="{% if resource.has_prev %}{{ url_for(request.endpoint,
+          page = 1, **kwargs) }}{% else %}#{% endif %}" aria-label="First">&laquo;&laquo; First </a>
+      </li>
+      
+
+
+      <li class="{{ 'disabled' if not resource.has_prev }}">
+        <a href="{% if resource.has_prev %}{{ url_for(request.endpoint,
+          page = resource.page - 1, **kwargs) }}{% else %}#{% endif %}"
+            aria-label="Previous">
+          Prev
+        </a>
+      </li>
+
+      {% for p in resource.iter_pages() %}
+        {% if p %}
+          {% if p == resource.page %}
+            <li class="active">
+            <a href="{{ url_for(request.endpoint, page = p, **kwargs) }}">{{ p }}</a>
+          </li>
+          {% else %}
+            <li>
+            <a href="{{ url_for(request.endpoint, page = p, **kwargs) }}">{{ p }}</a>
+            </li>
+          {% endif %}
         {% else %}
-          <span class="text-muted">{{ page }}</span>
+          <li class="disabled"><a href="#">&hellip;</a></li>
         {% endif %}
-      {% else %}
-        <span class="ellipsis">…</span>
-      {% endif %}
-    </li>
-  {%- endfor %}
-    <li class="{{ 'disabled' if not resource.has_next }}">
-      <a href="{{ url_for(request.endpoint, page=resource.page + 1, **args) }}"
-          aria-label="Next">
-        Next
-      </a>
-    </li>
-    <li class="{{ 'disabled' if resource.page == resource.pages }}">
-      <a href="{{ url_for(request.endpoint, page=resource.pages, **args) }}"
-          aria-label="Last">
-        Last &raquo;
-      </a>
-    </li>
-  </ul>
-{%- endmacro %}
+      {% endfor %}
+
+
+      <li class="{{ 'disabled' if not resource.has_next }}">
+        <a href="{% if resource.has_next %}{{ url_for(request.endpoint,
+          page = resource.page + 1, **kwargs) }}{% else %}#{% endif %}"
+            aria-label="Previous">
+          Prev
+        </a>
+      </li>
+
+      <li class="{{ 'disabled' if resource.page == resource.pages }}">
+        <a href="{% if resource.has_next %}{{ url_for(request.endpoint,
+          page = resource.pages, **kwargs) }}{% else %}#{% endif %}" aria-label="First">&raquo;&raquo; Last </a>
+      </li>
+    </ul>
+{% endmacro %}
+
+
+
+
+

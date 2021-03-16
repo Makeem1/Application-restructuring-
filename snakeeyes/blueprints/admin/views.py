@@ -30,12 +30,11 @@ def users():
     """Fucntion to list all users in the database."""
     form_search = SearchForm()
     bulk_form = BulkDeleteForm()
-
-    page = request.args.get('page', 1, type =int )
     sort_by = User.sort_by(request.args.get('sort', 'created_on'), 
                                             request.args.get('direction', 'desc'))
     order_values = '{0} {1}'.format(sort_by[0], sort_by[1])
 
+    page = request.args.get('page', 1 , type=int)
     paginated_users = User.query \
         .filter(User.search(request.args.get('q', ''))) \
         .order_by(User.role.asc(), text(order_values)) \
