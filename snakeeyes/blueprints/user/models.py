@@ -7,6 +7,7 @@ from flask import current_app
 from itsdangerous import TimedJSONWebSignatureSerializer
 from collections import OrderedDict
 from sqlalchemy import or_
+from faker import Faker as fake
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -26,7 +27,7 @@ class User(UserMixin, db.Model):
 
     # User credentials
     role = db.Column(db.Enum(*ROLE, name = 'role_type', native_enum = False), nullable = False, default='member')
-    username = db.Column(db.String(24), nullable=True, unique=True)
+    username = db.Column(db.String(128), nullable=True, unique=True)
     email = db.Column(db.String(128), nullable=False, unique = True)
     active = db.Column(db.Boolean, default = True, nullable=False)
     hash_password = db.Column(db.String(240), nullable=False)
@@ -112,7 +113,7 @@ class User(UserMixin, db.Model):
 
 
     @classmethod
-    def get_bulk_action_id(cls, scope, ids, omit_id=None, q=''):
+    def get_bulk_action_id(cls, scope, ids, omit_id=None, query=''):
         """Determine bulk of id to be deleted."""
         omit_id = list(map(str, omit_id))
 
@@ -121,7 +122,7 @@ class User(UserMixin, db.Model):
 
             ids = [str(item[0]) for item in ids]
 
-        if omit_ids:
+        if omit_id:
             ids = [id for id in ids if id not in omit_id]
 
         return ids
@@ -182,6 +183,43 @@ class User(UserMixin, db.Model):
         user = User.query.get(data.get('user_id'))
 
         return user.id
+
+
+    @classmethod
+    def add_fake(cls):
+        from random import seed, randint, choice
+        from sqlalchemy.exc import IntegrityError
+        from snakeeyes.extensions import fake
+
+        users = []
+
+        seed()
+        while len(users) < 100:
+            u = User(
+                email = fake.email(),
+                username = fake.name()+str(randint(0, 300)),
+                active = bool(choice([True, False])),
+                password = 'password',
+                sign_in_count = randint(0,20),
+                current_sign_in_on = fake.date_time_between(start_date='-1y', end_date='now'),
+                last_sign_in_ip = fake.ipv4(),
+                confirmed = bool(choice([True, False])),
+                current_sign_in_ip = fake.ipv4(),
+                last_sign_in_on = fake.date_time_between(start_date='-1y', end_date='now'),
+                created_on = fake.date_time_between(start_date='-15y', end_date='now'),
+                updated_on = fake.date_time_between(start_date='-15y', end_date='now')
+            )
+
+            users.append(u)
+
+            db.session.add(u)
+
+            try:
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
+
+            
 
 
         
