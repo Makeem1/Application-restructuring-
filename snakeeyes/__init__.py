@@ -1,5 +1,6 @@
 from flask import Flask
 
+from werkzeug.contrib.fixers import ProxyFix
 
 from snakeeyes.blueprints.contact import contact
 from snakeeyes.blueprints.page import page 
@@ -32,6 +33,7 @@ def create_app(override_settings=None):
 
     app.logger.setLevel(app.config['LOG_LEVEL'])
 
+    middleware(app)
     app.register_blueprint(contact)
     app.register_blueprint(page)
     app.register_blueprint(user)
@@ -48,3 +50,13 @@ def extension(app):
     debug_toolbar.init_app(app)
     db.init_app(app)
     login_manager.init_app(app)
+
+
+def middleware(app):
+    """This help to get the real ip address when using proxy server like nginx in production,
+        it serve as a gateway between flask wsgi
+    """
+
+    app.wsgi_app = ProxyFix(app.wsgi_app)
+
+    return None
