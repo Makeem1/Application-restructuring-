@@ -1,0 +1,8 @@
+{% extends 'layouts/app.html' %}
+
+{% block title %} Page not found error {% endblock %}
+
+{% block body %}
+    <h1>Page not found error. 404 Error</h1>
+    <P>This page cannot be found, return to home page? <a href="{{url_for('page.home')}}">Click here</a></P>
+{% endblock %}

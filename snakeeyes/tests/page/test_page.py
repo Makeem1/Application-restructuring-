@@ -21,3 +21,7 @@ class TestPage:
         response = client.get(url_for('page.terms'))
         assert response.status_code == 200
 
+    def test_error(self, client):
+        response = client.get('jsdjujhfuwihihwihiw')
+        assert response.status_code == 404
+
