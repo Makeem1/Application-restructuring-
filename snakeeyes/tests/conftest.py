@@ -2,7 +2,7 @@ import pytest
 from config import settings
 from snakeeyes import create_app
 from snakeeyes.extensions import db as _db
-from snakeeyes.user.models import User
+from snakeeyes.blueprints.user.models import User
 
 
 @pytest.fixture(scope = 'session')

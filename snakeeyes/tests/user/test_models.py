@@ -1,4 +1,4 @@
-from snakeeyes.user.models import User
+from snakeeyes.blueprints.user.models import User
 
 
 class TestUserToken:

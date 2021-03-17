@@ -45,7 +45,7 @@
       <li class="{{ 'disabled' if not resource.has_prev }}">
         <a href="{% if resource.has_prev %}{{ url_for(request.endpoint,
           page = resource.page - 1, **kwargs) }}{% else %}#{% endif %}"
-            aria-label="Previous">
+            aria-label="Previous">&laquo;
           Prev
         </a>
       </li>
@@ -70,7 +70,7 @@
       <li class="{{ 'disabled' if not resource.has_next }}">
         <a href="{% if resource.has_next %}{{ url_for(request.endpoint,
           page = resource.page + 1, **kwargs) }}{% else %}#{% endif %}"
-            aria-label="Previous">
+            aria-label="Previous">&raquo;
           Prev
         </a>
       </li>

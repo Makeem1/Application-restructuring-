@@ -2,6 +2,11 @@ from datetime import timedelta
 import os
 
 DEBUG = True
+LOG_LEVEL = 'DEBUG'
+
+# Google analytics 
+ANALYTICS_GOOGLE_UA = 'foo'
+
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 

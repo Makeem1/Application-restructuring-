@@ -1,4 +1,4 @@
-from flask import flash, request, url_for, render_template, redirect
+from flask import flash, request, url_for, render_template, redirect, current_app
 from snakeeyes.blueprints.user.forms import LoginForm, RegisterForm, WelcomeForm, RequestPasswordResetForm, NewPasswordForm, UpdateAccountForm, PasswordField
 from snakeeyes.blueprints.user import user
 from flask_login import login_user, logout_user, login_required, current_user, confirm_login
@@ -27,9 +27,13 @@ def login():
     if current_user.is_authenticated:
         flash("Operation already performed", 'info')
         return redirect(url_for('page.home'))
+
     form = LoginForm()
+
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
+        current_app.logger.debug('{0} has tried to log in with ip : {1}'.format(form.email.data, request.remote_addr))
+
         if user is not None and user.verify_password(form.password.data):
             if login_user(user, remember=True) and user.is_active():
                 flash('Log in successful', 'success')

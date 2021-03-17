@@ -1,5 +1,5 @@
 from flask import url_for
-from snakeeyes.user.models import User
+from snakeeyes.blueprints.user.models import User
 from lib.tests import ViewMixin
 
 class TestLogin(ViewMixin):
