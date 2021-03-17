@@ -1,0 +1,10 @@
+{% extends 'layouts/app.html' %}
+
+{% block title %} Page not found error {% endblock %}
+
+{% block body %}
+    <h1>The admin has been notified of the potential server error. Please stay calm and bear with
+        us till we solve the issue. Thank you
+    </h1>
+    <P><a href="{{url_for('page.home')}}">Click here </a>to return to home page.</P>
+{% endblock %}
