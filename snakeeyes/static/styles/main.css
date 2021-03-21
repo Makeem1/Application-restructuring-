@@ -21,6 +21,36 @@ html {
   
 	height: 60px;
   }
+
+  /*Helpers
+---------------------------------------------------*/
+.small {
+  font-size: 12px;
+}
+
+.strike {
+  text-decoration: line-through;
+}
+
+.spinner {
+  display: none;
+}
+
+.scale-up {
+  transform: scale(1.05);
+}
+
+.quarter-faded {
+  opacity: 0.75;
+}
+
+.half-faded {
+  opacity: 0.5;
+}
+
+.relative {
+  position: relative;
+}
   
   /* Margin and padding
   -------------------------------------------------- */

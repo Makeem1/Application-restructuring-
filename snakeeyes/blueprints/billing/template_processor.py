@@ -4,7 +4,7 @@ import pytz
 from lib.money import cent_to_dollar
 
 
-def format_currency(amount, convert_to_dollars):
+def format_currency(amount, convert_to_dollars=True):
     '''format currency to 2 deciaml places'''
 
     if convert_to_dollars:
