@@ -1,0 +1,40 @@
+{% macro plan(plan) -%}
+  <div class="col-md-4{{ ' scale-up' if plan.metadata.recommended }} {{ ' quarter-faded' if not plan.metadata.recommended }}">
+    <div class="panel panel-default{{ 'panel-danger' if plan.metadata.recommended }}">
+      <div class="panel-heading text-center"><h3>{{ plan.name }}</h3></div>
+      <div class="panel-body">
+        {{ caller () }}
+
+        {% if current_user.is_authenticated %}
+          {% if current_user.subscription %}
+            {% if plan == active_plan %}
+              <strong class="btn btn-default btn-lg btn-block">
+                Current plan
+              </strong>
+            {% else %}
+              <button id="submit_{{ plan.id }}" name="submit_{{ plan.id }}"
+                      class="btn btn-primary btn-lg btn-block">
+                <img src="{{ url_for('static', filename='images/spinner.gif') }}"
+                     class="spinner"
+                     width="16" height="11" alt="Spinner"/>
+                Change plan
+              </button>
+            {% endif %}
+          {% else %}
+            <a href="{{ url_for('billing.create', plan=plan.id) }}"
+               class="btn btn-primary btn-lg btn-block">Continue</a>
+          {% endif %}
+        {% else %}
+          <a href="{{ url_for('user.signup') }}"
+             class="btn btn-primary btn-lg btn-block">
+            Sign up
+          </a>
+        {% endif %}
+
+        <p class="small text-muted sm-margin-top text-center">
+          ${{ plan.amount | format_currency }} / {{ plan.interval }}
+        </p>
+      </div>
+    </div>
+  </div>
+{%- endmacro %}
