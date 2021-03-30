@@ -33,8 +33,7 @@
                 <li><a href="{{ url_for('user.settings') }}">Settings</a></li>
                 <li role="separator" class="divider"></li>
                 <li class="dropdown-header">Session</li>
-                <li><a href="{{ url_for('user.logout') }}">Log out</a></li>
-                
+                <li><a href="{{ url_for('user.logout') }}">Log out</a></li>  
               </ul>
             </li>
           {% elif current_user.is_authenticated and current_user.confirmed %}
