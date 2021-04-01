@@ -8,6 +8,12 @@ from itsdangerous import TimedJSONWebSignatureSerializer
 from collections import OrderedDict
 from sqlalchemy import or_
 from faker import Faker as fake
+from snakeeyes.blueprints.billing.models.credit_card import CreditCard
+from snakeeyes.blueprints.billing.models.subscriptions import Subscription
+
+
+
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -24,6 +30,12 @@ class User(UserMixin, db.Model):
     
     # Unique idntification number
     id = db.Column(db.Integer, primary_key = True)
+
+    # Credit card relationship 
+    credit_card = db.relationship(CreditCard, uselist=False, backref='users', passive_deletes=True)
+
+    # Subscription relationship
+    subscription = db.relationship(Subscription, backref='users', uselist=False, passive_deletes=True)
 
     # User credentials
     role = db.Column(db.Enum(*ROLE, name = 'role_type', native_enum = False), nullable = False, default='member')
