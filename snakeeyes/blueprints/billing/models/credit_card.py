@@ -50,6 +50,8 @@ class CreditCard(db.Modle):
             'is_expiring' : cls.is_expiring_soon(exp_date=exp_date)
         }
 
+        return card 
+
 
 
 
