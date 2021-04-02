@@ -43,7 +43,7 @@ class Subscription(db.Model):
             if isinstance(split_key, list) and len(split_key)== 2:
                 if Subscription.get_plan_by_id(split_key[1]):
                     return split_key[1]
-      return None
+        return None
 
 
     def create(cls, user=None, plan=None, coupon=None, token=None, name=None ):
@@ -56,7 +56,7 @@ class Subscription(db.Model):
             self.coupon = coupon.upper()
 
         customer = PaymentSubscription.create(token=token,
-        email=user.email,coupon=coupon=, plan=plan)
+        email=user.email,coupon=None, plan=plan)
 
         # Updating user details 
         user.name = name 

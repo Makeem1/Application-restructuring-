@@ -100,7 +100,8 @@ class Subscription(object):
 
         return subscription.save()
 
-    @classmethod cancel(cls, customer_id=None):
+    @classmethod 
+    def cancel(cls, customer_id=None):
         """This func cancel existing user subscription plan and the customer_id is the payment_id and return """
 
         customer = stripe.Customer.retrieve(customer_id)

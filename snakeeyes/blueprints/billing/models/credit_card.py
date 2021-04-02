@@ -3,10 +3,12 @@ import datetime
 from lib.datetime_difference import  timedelta_days
 from snakeeyes.extensions import db 
 
-class CreditCard(db.Modle):
+class CreditCard(db.Model):
     IS_EXPIRING_THRESHOLD_MONTHS = 60 
 
     __tablename__ = 'credit_cards'
+
+    id = db.Column(db.Integer, primary_key=True)
 
     # Foreign key
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', onupdate='CASCADE', ondelete='CASCADE'), index=True, nullable=False)
@@ -21,7 +23,7 @@ class CreditCard(db.Modle):
         super(CreditCard, self).__init__(**kwargs)
 
     @classmethod
-    def is_expiring_soon(cls, compare_date=None, exp_date=None:
+    def is_expiring_soon(cls, compare_date=None, exp_date=None):
         """Check card to expire in 60 days"""
         return exp_date <= timedelta_days(cls.IS_EXPIRING_THRESHOLD_MONTHS, compare_date=compare_date)
 

@@ -11,6 +11,7 @@ from lib.money import cent_to_dollar, dollars_to_cents
 from snakeeyes.extensions import db 
 from snakeeyes.blueprints.billing.gateways.stripecom import Coupon as PaymentCoupon
 
+
 class Coupon(db.Model):
     DURATION = [(
         ('forever', 'Forever'),
@@ -134,10 +135,71 @@ class Coupon(db.Model):
         return True
 
 
+    @classmethod
+    def bulk_delete(cls, ids=None):
+        """
+        Override the general bulk delete method to delete coupon from application and stripe
+        """
+        delete_count = 0
+
+        for id in ids:
+            coupon = Coupon.query.get(id)   
+
+            if coupon is None:
+                continue 
+                
+            # Delete on stripe 
+            stripe_delete = PaymentCoupon.delete(coupon)
+
+            # If successful, delete it locally 
+            if stripe_delete.get('delete'):
+                coupon.delete()
+                delete_count += 1
+
+        return delete_count
 
 
+    @classmethod
+    def find_by_code(cls, code):
+        """
+        Find a coupon by its code 
+        """
+
+        formatted_code = code.upper()
+
+        coupon = Coupon.query.filter(Coupon.redeemable, Coupon.code == formatted_code).first()
+
+        return coupon 
 
 
+    def redeem(self):
+        """
+        Update redeem stats for this coupon
+        """
+        self.times_redeemed += 1
+
+        if self.max_redemptions:
+            if self.times_redeemed >= self.max_redemptions:
+                self.valid = False
+
+        db.session.commit()
 
 
+    def to_json(self):
+        """
+        Retun JSON fields to represent a coupon 
+        """
 
+        params = {
+            'duration' : self.duration,
+            'duration_in_months' : self.duration_in_months
+        }
+
+
+        if self.amount_off:
+            params['amount_off'] = cent_to_dollar(self.amount_off)
+
+        if self.percent_off:
+            params['percent_off'] = self.percent_off
+
+        return params
