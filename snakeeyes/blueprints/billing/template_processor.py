@@ -1,16 +1,25 @@
 import datetime
 import pytz
 
-from lib.money import cent_to_dollar
-
+from lib.money import cent_to_dollars
 
 def format_currency(amount, convert_to_dollars=True):
-    '''format currency to 2 deciaml places'''
+    """
+    Pad currency with 2 decimals and commas,
+    optionally convert cents to dollars.
+
+    :param amount: Amount in cents or dollars
+    :type amount: int or float
+    :param convert_to_dollars: Convert cents to dollars
+    :type convert_to_dollars: bool
+    :return: str
+    """
 
     if convert_to_dollars:
-        amount = cent_to_dollar
-    
-    return "{:.2f}".format(amount)
+        amount = cent_to_dollars(amount)
+
+    return '{:,.2f}'.format(amount)
+
 
 
 def current_year():

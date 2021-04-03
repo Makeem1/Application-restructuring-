@@ -52,4 +52,4 @@ def handle_stripe_exceptions(f):
             'error')
             return redirect(url_for('user.settings'))
 
-        return decorated_function
+    return decorated_function

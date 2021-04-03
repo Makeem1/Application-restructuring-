@@ -21,7 +21,7 @@
 
 
 {% block body %}
-	{% call f.form_tag('billing.update', class='text-center') %}
+	{% call f.form_tag('billing.create', class='text-center') %}
 		{% if current_user.subscription %}
 			<div class="lg-margin-bottom">
 				<div class="coupon-code">

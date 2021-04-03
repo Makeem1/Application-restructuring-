@@ -29,7 +29,7 @@ class Subscription(db.Model):
 
         for key, value in settings.STRIPE_PLANS.items():
             if value.get('id') == plan:
-                return settings.STRIPE_PLANS[plan]
+                return settings.STRIPE_PLANS[key]
             
         return None
 

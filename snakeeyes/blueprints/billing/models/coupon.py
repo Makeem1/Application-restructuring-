@@ -7,33 +7,33 @@ import pytz
 from sqlalchemy import or_ , and_
 
 from sqlalchemy.ext.hybrid import hybrid_property
-from lib.money import cent_to_dollar, dollars_to_cents
+from lib.money import cent_to_dollars, dollars_to_cents
 from snakeeyes.extensions import db 
 from snakeeyes.blueprints.billing.gateways.stripecom import Coupon as PaymentCoupon
 
 
 class Coupon(db.Model):
-    DURATION = [(
+    DURATION = OrderedDict([
         ('forever', 'Forever'),
         ('once', 'Once'),
         ('repeating', 'Repeating')
-    )]
+    ])
 
     __tablename__ = 'coupons'
-
     id = db.Column(db.Integer, primary_key=True)
 
-    # Coupon details
-    code = db.Column(db.String(123), index=True, unique=True)
-    duration = db.Column(db.Enum(*DURATION, name='duration_type'), index=True, nullable=False, server_default='forever')
+    # Coupon details.
+    code = db.Column(db.String(128), index=True, unique=True)
+    duration = db.Column(db.Enum(*DURATION, name='duration_types'),
+                         index=True, nullable=False, default='forever')
     amount_off = db.Column(db.Integer())
     percent_off = db.Column(db.Integer())
     currency = db.Column(db.String(8))
     duration_in_months = db.Column(db.Integer())
     max_redemptions = db.Column(db.Integer(), index=True)
     redeem_by = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
-    times_redeemed = db.Column(db.Integer(), index=True, nullable=False, default=0)
-
+    times_redeemed = db.Column(db.Integer(), index=True,
+                               nullable=False, default=0)
     valid = db.Column(db.Boolean(), nullable=False, server_default='1')
 
 
