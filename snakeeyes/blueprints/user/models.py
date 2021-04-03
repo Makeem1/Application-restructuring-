@@ -12,9 +12,6 @@ from snakeeyes.blueprints.billing.models.credit_card import CreditCard
 from snakeeyes.blueprints.billing.models.subscriptions import Subscription
 
 
-
-
-
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(user_id)
