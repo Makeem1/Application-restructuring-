@@ -10,7 +10,7 @@ from sqlalchemy import or_
 from faker import Faker as fake
 from snakeeyes.blueprints.billing.models.credit_card import CreditCard
 from snakeeyes.blueprints.billing.models.subscriptions import Subscription
-
+from snakeeyes.blueprints.billing.models.invoice import Invoice
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -34,6 +34,9 @@ class User(UserMixin, db.Model):
     # Subscription relationship
     subscription = db.relationship(Subscription, backref='users', uselist=False, passive_deletes=True)
 
+    # Invoic Relationships 
+    invoice = db.relationship(Invoice, backref='users', passive_deletes=True)
+
     # User credentials
     role = db.Column(db.Enum(*ROLE, name = 'role_type', native_enum = False), nullable = False, default='member')
     username = db.Column(db.String(128), nullable=True, unique=True)
@@ -48,6 +51,11 @@ class User(UserMixin, db.Model):
     current_sign_in_ip = db.Column(db.String(24)) 
     last_sign_in_on = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
     last_sign_in_ip = db.Column(db.String(24)) 
+
+    # Billing.
+    name = db.Column(db.String(128), index=True)
+    payment_id = db.Column(db.String(128), index=True)
+    cancelled_subscription_on = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
 
     # User run time
     created_on = db.Column(db.DateTime(), default = datetime.datetime.utcnow)

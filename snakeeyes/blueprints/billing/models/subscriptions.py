@@ -46,7 +46,7 @@ class Subscription(db.Model):
         return None
 
 
-    def create(cls, user=None, plan=None, coupon=None, token=None, name=None ):
+    def create(self, user=None, plan=None, coupon=None, token=None, name=None ):
         """Create a recurring subscription"""
 
         if token is None:

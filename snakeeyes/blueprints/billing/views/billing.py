@@ -102,8 +102,7 @@ def cancel():
 
     if form.validate_on_submit:
         subscription = Subscription()
-        cancelled = subscription.cancel(user.current_user)
-
+        cancelled = subscription.cancel(user = current_user)
 
         if cancelled:
             flash('Sorry to see you go, your subscription has been calcelled', 'success')
@@ -142,14 +141,3 @@ def update_paymethod_method():
 
         return redirect(url_for('user.settings'))
     return render_template('billing/payment_method.html', form=form, plan=active_plan, card_last4 = str(card.last4))
-
-
-
-
-
-
-
-
-
-    
-
