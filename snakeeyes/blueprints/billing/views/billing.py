@@ -2,7 +2,9 @@ from flask import Blueprint, request, redirect, url_for, render_template, flash,
 from flask_login import current_user, login_required
 from config import settings
 from snakeeyes.blueprints.billing.decorators import subscription_required, handle_stripe_exceptions
-from snakeeyes.blueprints.billing.models.subscriptions import Subscription 
+from snakeeyes.blueprints.billing.models.subscriptions import Subscription
+from snakeeyes.blueprints.billing.models.invoice import Invoice 
+from snakeeyes.blueprints.billing.models.coupon import Coupon
 from snakeeyes.blueprints.billing.forms import CreditCardForm, UpdateSubscriptionForm, CancelSubscriptionForm
 from config import settings
 
@@ -39,7 +41,7 @@ def create():
     stripe_key = current_app.config.get('STRIPE_PUBLISHABLE_KEY')
     print(stripe_key)
     form = CreditCardForm(stripe_key=stripe_key, plan=plan)
-
+    
     if form.validate_on_submit():
         subscription = Subscription()
         created = subscription.create(user=current_user,
@@ -59,67 +61,73 @@ def create():
                            form=form, plan=subscription_plan)
 
 
-@billing.route('/update')
-@subscription_required
+@billing.route('/update', methods=['GET', 'POST'])
 @handle_stripe_exceptions
+@subscription_required 
 @login_required
 def update():
     current_plan = current_user.subscription.plan
-    activa_plan = Subscription.get_plan_by_id(current_plan)
+    active_plan = Subscription.get_plan_by_id(current_plan)
     new_plan = Subscription.get_new_plan(request.form.keys())
 
-    plan = Subscription.get_new_plan(new_plan)
+    plan = Subscription.get_plan_by_id(new_plan)
 
-    # Guard against invalid plan or similar plan 
-    is_same_plan = new_plan == activa_plan['id']
-    if ((new_plan is not None and plan is None) or is_same_plan) and request.method == 'POST':
+    # Guard against an invalid, missing or identical plan.
+    is_same_plan = new_plan == active_plan['id']
+    if ((new_plan is not None and plan is None) or is_same_plan) and \
+            request.method == 'POST':
         return redirect(url_for('billing.update'))
 
-    form = UpdateSubscriptionForm(coupon = current_user.subscriptions.coupon)
+    form = UpdateSubscriptionForm(coupon_code=current_user.subscription.coupon)
 
-    if form.validate_on_submit:
+    if form.validate_on_submit():
         subscription = Subscription()
         updated = subscription.update(user=current_user,
-                                     coupon=form.coupon_code.data,
-                                     plan=plan.get('id'))
+                                      coupon=request.form.get('coupon_code'),
+                                      plan=plan.get('id'))
 
         if updated:
-            flash('Your plan has been updated.', 'success')
+            flash('Your subscription has been updated.', 'success')
             return redirect(url_for('user.settings'))
 
-    return render_template('billing/pricing.html', form = form , plans = settings.STRIPE_PLANS, active_plan = activa_plan)   
+    return render_template('billing/pricing.html',
+                           form=form,
+                           plans=settings.STRIPE_PLANS,
+                           active_plan=active_plan)
 
 
-@billing.route('/cancel')
+@billing.route('/cancel', methods=['GET', 'POST'])
 @handle_stripe_exceptions
 @login_required
 def cancel():
     if not current_user.subscription:
-        flash('You do not have active subscription.', 'info')
-        return redirect(url_for('billing.pricing'))
+        flash('You do not have an active subscription.', 'error')
+        return redirect(url_for('user.settings'))
 
     form = CancelSubscriptionForm()
 
-    if form.validate_on_submit:
+    if form.validate_on_submit():
         subscription = Subscription()
-        cancelled = subscription.cancel(user = current_user)
+        cancelled = subscription.cancel(user=current_user)
 
         if cancelled:
-            flash('Sorry to see you go, your subscription has been calcelled', 'success')
+            flash('Sorry to see you go, your subscription has been cancelled.',
+                  'success')
             return redirect(url_for('user.settings'))
 
-    return render_template('billing/cancel.html', form = form)
+    return render_template('billing/cancel.html', form=form)
 
 
-@billing.route('/update')
+@billing.route('/update_payment_method', methods=['GET', 'POST'])
 @handle_stripe_exceptions
 @login_required
-def update_paymethod_method():
+def update_payment_method():
     if not current_user.credit_card:
-        flash('You do not have a payment credit card on file.', 'info')
+        flash('You do not have a payment method on file.', 'error')
         return redirect(url_for('user.settings'))
 
-    active_plan = Subscription.get_plan_by_id(current_user.subscripion.plan)
+    active_plan = Subscription.get_plan_by_id(
+        current_user.subscription.plan)
 
     card = current_user.credit_card
     stripe_key = current_app.config.get('STRIPE_PUBLISHABLE_KEY')
@@ -127,17 +135,38 @@ def update_paymethod_method():
                           plan=active_plan,
                           name=current_user.name)
 
-    if form.validate_on_submit:
+    if form.validate_on_submit():
         subscription = Subscription()
-        updated = subscription.update(user = current_user,
-                                      credit_card = card,
-                                      name = request.form.get('name'),
-                                      token = request.form.get('stripe_token'))
+        updated = subscription.update_payment_method(user=current_user,
+                                                     credit_card=card,
+                                                     name=request.form.get(
+                                                         'name'),
+                                                     token=request.form.get(
+                                                         'stripe_token'))
+        print(request.form.get('stripe_token'))
 
         if updated:
-            flash('You payment method has been updated.', 'success')
+            flash('Your payment method has been updated.', 'success')
         else:
-            flash('You must enable javascript for this request.', 'warning')
+            flash('You must enable JavaScript for this request.', 'warning')
 
         return redirect(url_for('user.settings'))
-    return render_template('billing/payment_method.html', form=form, plan=active_plan, card_last4 = str(card.last4))
+
+    return render_template('billing/payment_method.html', form=form,
+                           plan=active_plan, card_last4=str(card.last4))
+
+@billing.route('/billing_details')
+@handle_stripe_exceptions
+@login_required
+def billing_details():
+    invoices = Invoice.billing_history(current_user)
+
+    if current_user.subscription:
+        upcoming = Invoice.upcoming(current_user.payment_id)
+        coupon = Coupon.query.filter(Coupon.code == current_user.subscription.coupon).first()
+
+    else:
+        upcoming = None
+        coupon = None
+
+    return render_template('billing/billing_details.html', upcoming = upcoming, invoices=invoices, coupon=coupon)

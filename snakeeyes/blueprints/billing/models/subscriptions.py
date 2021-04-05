@@ -1,4 +1,5 @@
 import datetime 
+import pytz
 from snakeeyes.extensions import db
 from snakeeyes.blueprints.billing.models.credit_card import CreditCard 
 from snakeeyes.blueprints.billing.models.coupon import Coupon
@@ -72,8 +73,12 @@ class Subscription(db.Model):
             coupon=Coupon.query.filter(Coupon.coupon == self.coupon).first()
             coupon.redeem()
 
+        credit_card = CreditCard(user_id = user.id, 
+                                **CreditCard.extract_card_params(customer))
+
         db.session.add(user)
         db.session.add(self)
+        db.session.add(credit_card)
 
         db.session.commit()
 
@@ -84,7 +89,7 @@ class Subscription(db.Model):
 
         PaymentSubscription.update(customer_id=user.payment_id, coupon=coupon, plan =plan)
 
-        user.subscribtion.plan = plan 
+        user.subscription.plan = plan 
         if coupon:
             user.subscription.coupon = coupon
             coupon = Coupon.query.filter(Coupon.coupon == coupon).first()
@@ -98,7 +103,7 @@ class Subscription(db.Model):
         return True 
 
 
-    def cancel(self, user=None, discard_credit_card=None):
+    def cancel(self, user=None, discard_credit_card=True):
         """Cancel an existing subscription"""
 
         PaymentSubscription.cancel(user.payment_id)
@@ -116,13 +121,13 @@ class Subscription(db.Model):
         return True
 
 
-    def update_paymethod_method(self, user=None, credit_card=None, name=None, token=None):
-        """Updating user existing user card"""
+    def update_payment_method(self, user=None, credit_card=None, name=None, token=None):
+        """Updating user existing card"""
 
         if token is None:
             return False
 
-        customer = PaymentSubscription.update(customer_id=user.payment_id, token=token)
+        customer = PaymentCard.update(customer_id=user.payment_id, stripe_token=token)
 
         # Update user details 
         user.name = name

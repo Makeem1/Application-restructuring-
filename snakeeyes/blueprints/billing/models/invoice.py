@@ -5,8 +5,11 @@ from snakeeyes.blueprints.billing.gateways.stripecom import Invoice as PaymentIn
 class Invoice(db.Model):
     __tablename__ = 'invoices' 
 
+    # Unique ID
+    id = db.Column(db.Integer, primary_key = True)
+
     # Relationships
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id', onupdate = 'CASCADE', ondelete='CASCADE'), index=True, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', onupdate = 'CASCADE', ondelete='CASCADE'), index=True, nullable=False)
 
     # Invoices details 
     plan = db.Column(db.String(128), index=True)
@@ -28,7 +31,7 @@ class Invoice(db.Model):
     # Invoice runtime 
     created_on = db.Column(db.DateTime(), default = datetime.datetime.utcnow)
 
-    def __init__.(self, **kwargs):   
+    def __init__(self, **kwargs):   
         super(Invoice, self).__init__(**kwargs)
 
 
@@ -37,9 +40,39 @@ class Invoice(db.Model):
         """
         Return a billing history for a particular user
         """
-        invoices = cls.query.filter(cls.user_id == user.id).order_by(cls.created_on.desc()).limit()
+        invoices = cls.query.filter(cls.user_id == user.id).order_by(cls.created_on.desc()).limit(12)
 
         return invoices
+
+    @classmethod
+    def parse_from_api(cls, payload):
+        """
+        Parse and return invoice information we are interested in.
+        """
+        plan_info = payload['lines']['data'][0]['plan']
+        date = datetime.datetime.utcfromtimestamp(payload['date'])
+
+        invoice = {
+            'plan': plan_info['name'],
+            'description': plan_info['statement_descriptor'],
+            'next_bill_on': date,
+            'amount_due': payload['amount_due'],
+            'interval': plan_info['interval']
+        }
+
+        return invoice
+
+
+    @classmethod
+    def upcoming(cls, customer_id):
+        """
+        Return the upcoming invoice
+        """
+
+        invoice = PaymentInvoice.upcoming(customer_id=customer_id)
+
+        return Invoice.parse_from_api(invoice)
+
 
     
     

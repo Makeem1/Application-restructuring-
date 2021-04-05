@@ -236,7 +236,15 @@ class User(UserMixin, db.Model):
             except IntegrityError:
                 db.session.rollback()
 
-            
+    @classmethod
+    def add_admin(cls):
+        admin = User(email = 'moshoodakeemolayinka@gmail.com', 
+                            password='Olayinka1?', confirmed=True, role='admin')
+
+        db.session.add(admin)
+        db.session.commit()
+
+        return True 
 
 
         

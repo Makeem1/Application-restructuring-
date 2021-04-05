@@ -111,7 +111,7 @@ def welcome():
 
 @user.route('/updateaccount', methods=['GET', 'POST'])
 @login_required
-def update_credentails():
+def update_credentials():
     form = UpdateAccountForm()
     if form.validate_on_submit():
         new_password = form.password.data

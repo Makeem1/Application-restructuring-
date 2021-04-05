@@ -120,7 +120,7 @@ class Invoice(object):
 
 class Card(object):
     @classmethod
-    def update(cls, customer_id=None, stripe_token=None):
+    def update(cls, customer_id, stripe_token=None):
         """Updating a user payment card and saving it to the database"""
 
         customer = stripe.Customer.retrieve(customer_id)

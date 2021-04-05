@@ -15,7 +15,7 @@ class CreditCard(db.Model):
 
     # Card details
     brand = db.Column(db.String(32))
-    last_4 = db.Column(db.Integer)
+    last4 = db.Column(db.Integer)
     exp_date = db.Column(db.Date, index=True)
     is_expiring = db.Column(db.Boolean(), nullable=False, server_default='0')
 
@@ -25,15 +25,15 @@ class CreditCard(db.Model):
     @classmethod
     def is_expiring_soon(cls, compare_date=None, exp_date=None):
         """Check card to expire in 60 days"""
-        return exp_date <= timedelta_days(cls.IS_EXPIRING_THRESHOLD_MONTHS, compare_date=compare_date)
+        return exp_date <= timedelta_days(CreditCard.IS_EXPIRING_THRESHOLD_MONTHS, compare_date=compare_date)
 
     @classmethod
-    def mark_old_credit_card(cls, compare_date=None):
+    def mark_old_credit_cards(cls, compare_date=None):
         """Mark credit card that are going to expire in two months or has expired"""
 
-        today_with_delta = timedelta_days(cls.IS_EXPIRING_THRESHOLD_MONTHS, compare_date=compare_date)
+        today_with_delta = timedelta_days(CreditCard.IS_EXPIRING_THRESHOLD_MONTHS, compare_date=compare_date)
 
-        CreditCard.query.filter(cls.exp_date <= today_with_delta).update({cls.is_expiring:true})
+        CreditCard.query.filter(CreditCard.exp_date <= today_with_delta).update({CreditCard.is_expiring:True})
 
         return db.session.commit()
 
@@ -49,7 +49,7 @@ class CreditCard(db.Model):
             'brand' : card_data.brand,
             'last4' : card_data.last4,
             'exp_date' : exp_date,
-            'is_expiring' : cls.is_expiring_soon(exp_date=exp_date)
+            'is_expiring' : CreditCard.is_expiring_soon(exp_date=exp_date)
         }
 
         return card 

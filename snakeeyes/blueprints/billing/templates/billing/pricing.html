@@ -21,12 +21,12 @@
 
 
 {% block body %}
-	{% call f.form_tag('billing.create', class='text-center') %}
+	{% call f.form_tag('billing.update', class='text-center') %}
 		{% if current_user.subscription %}
 			<div class="lg-margin-bottom">
 				<div class="coupon-code">
 					{{ form.coupon_code.label }}
-					{{ f.field(form.coupon_code)}}
+					{{ f.field_input(form.coupon_code)}}
 					<div id="coupon_code_status" class="small alert alert-small alert-success">
 					</div>
 				</div>

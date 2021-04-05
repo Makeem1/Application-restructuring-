@@ -2,7 +2,7 @@ from flask import render_template
 
 from snakeeyes.blueprints.page import page 
 
-@page.route('/')
+@page.route('/home')
 def home():
     return render_template('page/home.html')
 
