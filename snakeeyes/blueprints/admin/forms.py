@@ -29,3 +29,7 @@ class UserForm(Form):
 
         if user :
             raise ValidationError("Username already taken by another user, please choose another username. Thanks")
+
+
+class CanUserSubscriptionForm(Form):
+    pass

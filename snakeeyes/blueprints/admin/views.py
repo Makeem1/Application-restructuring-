@@ -3,7 +3,7 @@ from snakeeyes.blueprints.admin import admin
 from flask_login import login_required
 from snakeeyes.blueprints.admin.decorators import role_required
 from snakeeyes.blueprints.admin.models import DashBoard
-from snakeeyes.blueprints.admin.forms import SearchForm, UserForm, BulkDeleteForm 
+from snakeeyes.blueprints.admin.forms import SearchForm, UserForm, BulkDeleteForm , CanUserSubscriptionForm
 from sqlalchemy import text
 from snakeeyes.blueprints.user.models import User
 from flask_login import current_user
@@ -22,7 +22,11 @@ def before_request():
 @admin.route('')
 def dashboard():
     group_and_count_users = DashBoard.group_and_count_users()
-    return render_template('admin/page/admin.html', group_and_count_users = group_and_count_users)
+    group_and_count_users = DashBoard.group_and_count_plans()
+    group_and_count_users = DashBoard.group_and_count_coupons()
+    return render_template('admin/page/admin.html', group_and_count_users = group_and_count_users, 
+                            group_and_count_coupons = group_and_count_coupons,
+                            group_and_count_plans = group_and_count_plans)
 
 
 @admin.route('/users')
@@ -97,3 +101,7 @@ def users_bulk_delete():
 
     return redirect(url_for('admin.users'))
 
+
+@admin.route('/canel_user_subscription')
+def canel_user_subscription():
+    pass
