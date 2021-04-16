@@ -28,7 +28,7 @@ class DashBoard(object):
         if total == 0:
             percent = 0 
         else:
-            percent = round(not_null / float(total), 1)
+            percent = round((not_null / float(total)), 1)
         return not_null, total, percent
 
     @classmethod
