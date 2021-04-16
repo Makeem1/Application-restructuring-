@@ -14,9 +14,9 @@ from snakeeyes.blueprints.billing.gateways.stripecom import Coupon as PaymentCou
 
 class Coupon(db.Model):
     DURATION = OrderedDict([
-        ('forever', 'Forever'),
         ('once', 'Once'),
-        ('repeating', 'Repeating')
+        ('repeating', 'Repeating'),
+        ('forever', 'Forever')
     ])
 
     __tablename__ = 'coupons'
@@ -36,6 +36,7 @@ class Coupon(db.Model):
                                nullable=False, default=0)
     valid = db.Column(db.Boolean(), nullable=False, server_default='1')
 
+    created_on = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
 
     def __init__(self, **kwargs):
         if self.code:
@@ -69,6 +70,11 @@ class Coupon(db.Model):
 
         return or_(cls.code.ilike(search_query))
 
+        # search_query = '%{0}%'.format(query)
+        # search_chain = (User.email.ilike(search_query),
+        #                 User.username.ilike(search_query))
+                        
+        # return or_(*search_chain)
 
     @classmethod
     def random_coupon_code(cls):
@@ -119,10 +125,12 @@ class Coupon(db.Model):
 
         PaymentCoupon.create(**payment_params)
 
+        # Stripe will save the coupon to id field on stripe while on our database, we want it to save on code field
         if 'id' in payment_params:
             payment_params['code'] = payment_params['id']
             del payment_params['id']
 
+        # Converting th eunix time to day stim stamp that is acceptable by the databse
         if 'redeem_by' in payment_params:
             if payment_params.get('redeem_by') is not None:
                 params['redeem_by'] = payment_params.get('redeem_by').replace(datetime.datetime.utcnow)
@@ -136,14 +144,15 @@ class Coupon(db.Model):
 
 
     @classmethod
-    def bulk_delete(cls, ids=None):
+    def bulk_delete(cls, ids):
         """
         Override the general bulk delete method to delete coupon from application and stripe
         """
         delete_count = 0
 
         for id in ids:
-            coupon = Coupon.query.get(id)   
+            coupon = Coupon.query.get(id)
+            print(coupon)
 
             if coupon is None:
                 continue 
@@ -152,8 +161,8 @@ class Coupon(db.Model):
             stripe_delete = PaymentCoupon.delete(coupon)
 
             # If successful, delete it locally 
-            if stripe_delete.get('delete'):
-                coupon.delete()
+            if stripe_delete.get('deleted'):
+                db.session.delete(coupon)
                 delete_count += 1
 
         return delete_count
@@ -182,7 +191,7 @@ class Coupon(db.Model):
             if self.times_redeemed >= self.max_redemptions:
                 self.valid = False
 
-        db.session.commit()
+        return db.session.commit()
 
 
     def to_json(self):
@@ -203,3 +212,33 @@ class Coupon(db.Model):
             params['percent_off'] = self.percent_off
 
         return params
+
+    @classmethod
+    def sort_by(cls, field, direction):
+        """This help to sort the user base on the field column and direction. """
+
+        if field not in cls.__table__.columns:
+            field = "created_on"
+        
+        if direction not in ('asc', 'desc'):
+            direction = 'asc'
+
+        return field, direction
+
+
+    @classmethod
+    def get_bulk_action_ids(cls, scope, ids, omit_ids=[], query=''):
+        """Determine which id to be deleted."""
+        omit_ids = list(map(str, omit_ids))
+
+
+        if scope == 'all_search_result':
+            ids = cls.query.with_entities(cls.id).filter(cls.search(query))
+            
+            ids = [ str(item[0]) for item in ids]
+
+
+        if omit_ids:
+            ids = [id for id in ids if id not in omit_ids]
+
+        return ids
