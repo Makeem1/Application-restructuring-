@@ -10,6 +10,7 @@ from snakeeyes.blueprints.page import page
 from snakeeyes.blueprints.user import user
 from snakeeyes.blueprints.admin import admin 
 from snakeeyes.blueprints.billing import billing
+from snakeeyes.blueprints.billing import stripe_webhook
 from snakeeyes.blueprints.error_page import error
 from snakeeyes.extensions import Csrf, mail, debug_toolbar, db, login_manager
 from snakeeyes.blueprints.billing.template_processor import current_year, format_currency
@@ -50,6 +51,7 @@ def create_app(override_settings=None):
     app.register_blueprint(admin)
     app.register_blueprint(error)
     app.register_blueprint(billing)
+    app.register_blueprint(stripe_webhook)
     template_processors(app)
     extension(app)
 
