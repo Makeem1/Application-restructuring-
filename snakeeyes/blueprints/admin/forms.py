@@ -39,6 +39,9 @@ class BulkDeleteForm(Form):
 class UserForm(Form):
     Role = [('member', "Member"),
         ("admin", "Admin")]
+
+    coins = IntegerField('Coins', validators=[DataRequired(), 
+                        NumberRange(min=1, max=21345678)])
     username = StringField('Username', validators=[Optional(), Length(min=4, max=28)])
     role = SelectField('Priviledegs', validators=[DataRequired()], choices = Role )
     active = BooleanField("Check to allow user to sign in.")
