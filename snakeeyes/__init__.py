@@ -12,7 +12,8 @@ from snakeeyes.blueprints.admin import admin
 from snakeeyes.blueprints.billing import billing
 from snakeeyes.blueprints.billing import stripe_webhook
 from snakeeyes.blueprints.error_page import error
-from snakeeyes.extensions import Csrf, mail, debug_toolbar, db, login_manager
+from snakeeyes.blueprints.bet import bet
+from snakeeyes.extensions import Csrf, mail, debug_toolbar, db, login_manager, limiter
 from snakeeyes.blueprints.billing.template_processor import current_year, format_currency
 
 login_manager.login_view = 'user.login'
@@ -51,6 +52,7 @@ def create_app(override_settings=None):
     app.register_blueprint(admin)
     app.register_blueprint(error)
     app.register_blueprint(billing)
+    app.register_blueprint(bet)
     app.register_blueprint(stripe_webhook)
     template_processors(app)
     extension(app)
@@ -64,6 +66,8 @@ def extension(app):
     debug_toolbar.init_app(app)
     db.init_app(app)
     login_manager.init_app(app)
+    limiter.init_app(app)
+
 
 
 def middleware(app):
