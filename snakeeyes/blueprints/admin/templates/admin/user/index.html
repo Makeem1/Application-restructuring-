@@ -1,27 +1,25 @@
-{% extends 'layouts/app.html'%}
-{% import 'macros/form.html' as f with context %}
+{% extends 'layouts/app.html' %}
 {% import 'macros/items.html' as items %}
+{% import 'macros/form.html' as f with context %}
 {% import 'macros/user.html' as account %}
 
-{% block title %}Admin - Users / List {% endblock %}
+{% block title %}Admin - Users / List{% endblock %}
 
-{% block body %} 
+{% block body %}
+  {{ f.search('admin.users') }}
 
-	{{ f.search('admin.users') }}
+  {% if users.total == 0 %}
+    <h3>No results found</h3>
 
-	{% if users.total == 0 %}
-		<h3>No results found</h3>
-
-		{% if request.args.get('q') %}
-			<p>Try limiting your search terms.</p>
-		{% else %}
-			<p>There are no users present, you should <a href="{{ url_for('user.register')}}">Sign up user</a>.</p>
-		{% endif %}
-
-	{% else %}
-
-		{% call f.form_tag('admin.users_bulk_delete') %}
-		<table class="table table-striped">
+    {% if request.args.get('q') %}
+      <p>Try limiting or removing your search terms.</p>
+    {% else %}
+      <p>There are no users present,
+         you should <a href="{{ url_for('user.signup') }}">sign up</a>.</p>
+    {% endif %}
+  {% else %}
+    {% call f.form_tag('admin.users_bulk_delete') %}
+      <table class="table table-striped">
         <thead>
           <tr>
             <th>
@@ -35,7 +33,7 @@
               {{ items.sort('name') }}
             </th>
             <th class="col-header">
-              {{ items.sort('last_sign_in_on', 'Last seen') }}
+              {{ items.sort('last_bet_on', 'Activity') }}
             </th>
             <th class="col-header">
               {{ items.sort('sign_in_count', 'Sign in count') }}
@@ -75,11 +73,20 @@
                 <p class="text-muted">{{ user.email }}</p>
               </a>
             </td>
-            <td>
+            <td class="small">
               {% if user.last_sign_in_on %}
+                Last seen: 
                 <time class="from-now"
                       data-datetime="{{ user.last_sign_in_on }}">
                   {{ user.last_sign_in_on }}
+                </time>
+              {% endif %}
+              {% if user.last_bet_on %}
+                <br/>
+                Latest bet:
+                <time class="from-now"
+                      data-datetime="{{ user.last_bet_on }}">
+                  {{ user.last_bet_on }}
                 </time>
               {% endif %}
             </td>
@@ -88,8 +95,8 @@
         {% endfor %}
         </tbody>
       </table>
-		{% endcall %}
+    {% endcall %}
 
     {{ items.paginate(users) }}
-	{% endif %}
+  {% endif %}
 {% endblock %}
