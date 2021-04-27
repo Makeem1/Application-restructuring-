@@ -70,7 +70,7 @@ class Subscription(db.Model):
 
         # Redeem the coupon
         if coupon:
-            coupon=Coupon.query.filter(Coupon.coupon == self.coupon).first()
+            coupon=Coupon.query.filter(Coupon.code == self.coupon).first()
             coupon.redeem()
 
         credit_card = CreditCard(user_id = user.id, 
