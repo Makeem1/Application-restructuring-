@@ -13,7 +13,7 @@
 {% endif %}
 
 <div class="row">
-  <div class="col-6  col-md-5 well">
+  <div class="col-md-5 well">
     {% call f.form_tag(endpoint, **form_kwargs) %}
       <legend>{{ legend }}</legend>
       <div class="form-group">
@@ -30,9 +30,24 @@
           {{ user.email }}
         </p>
       </div>
+      <div class="form-group">
+        <label class="control-label"><strong>Last bet on</strong></label>
+        <p class="sm-margin-bottom form-control-static">
+          {% if user.last_bet_on %}
+          <time class="from-now" data-datetime="{{ user.last_bet_on }}">
+            {{ user.last_bet_on }}
+          </time>
+          {% else %}
+            N/A
+          {% endif %}
+        </p>
+      </div>
 
-      {% call f.form_group(form.username, css_class='sm-margin-bottom',
-                            autofocus='autofocus') %}
+      {% call f.form_group(form.coins, css_class='sm-margin-bottom',
+                           autofocus='autofocus') %}
+      {% endcall %}
+
+      {% call f.form_group(form.username, css_class='sm-margin-bottom') %}
       {% endcall %}
 
       {% call f.form_group(form.role, css_class='sm-margin-bottom') %}
@@ -43,12 +58,12 @@
 
       <hr/>
       <div class="row">
-        <div class="col-md-3">
+        <div class="col-md-6">
           <button type="submit" class="btn btn-primary btn-block">
             {{ button }}
           </button>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-6">
           <div class="visible-xs visible-sm sm-margin-top"></div>
           <a href="{{ url_for('admin.users') }}"
               class="btn btn-default btn-block">
@@ -58,10 +73,71 @@
       </div>
     {% endcall %}
   </div>
-
   <div class="col-md-5 col-md-push-1 col-md-offset-1">
-    <h3>Login activity</h3>
+    <h3>Subscription details</h3>
+    {% include 'admin/user/_billing_details.html' with context %}
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <dl>
+          {% if user.subscription and user.credit_card %}
+            <dt>Subscribed</dt>
+            <dd class="sm-margin-bottom">
+              <time class="from-now"
+                    data-datetime="{{ user.subscription.created_on }}">
+                {{ user.subscription.created_on }}
+              </time>
+              (<a href="#billing_details"
+                data-toggle="modal"
+                data-target="#billing_details">View billing details</a>)
+            </dd>
+            <dt>Plan</dt>
+            <dd class="sm-margin-bottom">
+              {{ user.subscription.plan | title }}
+              {% if user.subscription.coupon %}
+                <span class="small text-muted">
+                  (coupon: {{ user.subscription.coupon }})
+                </span>
+              {% endif %}
+            </dd>
+            <dt>Credit card</dt>
+            <dd class="sm-margin-bottom">
+              {{ user.name }}<br/>
+              {{ user.credit_card.brand }}
+              ****{{ user.credit_card.last4 }}
+              ({{ user.credit_card.exp_date.strftime('%m/%Y') }})
+            </dd>
+            {% call f.form_tag('admin.users_cancel_subscription') %}
+              <input type="hidden" id="id" name="id" value="{{ user.id }}"/>
+              <button type="submit" class="btn btn-danger">
+                <img src="{{ url_for('static', filename='images/spinner.gif') }}"
+                    class="spinner"
+                    width="16" height="11" alt="Spinner"/>
+                  Cancel subscription
+              </button>
+            {% endcall %}
+          {% else %}
+            {% if user.cancelled_subscription_on %}
+              <dt>Cancelled</dt>
+              <dd>
+                <time class="from-now"
+                      data-datetime="{{ user.cancelled_subscription_on }}">
+                  {{ user.cancelled_subscription_on }}
+                </time>
+              {% if user.invoices %}
+                (<a href="#billing_details"
+                  data-toggle="modal"
+                  data-target="#billing_details">View billing history</a>)
+              {% endif %}
+              </dd>
+            {% else %}
+              <p>This user has never subscribed.</p>
+            {% endif %}
+          {% endif %}
+        </dl>
+      </div>
+    </div>
 
+    <h3>Login activity</h3>
     <div class="panel panel-default">
       <div class="panel-body">
         <dl>
@@ -78,10 +154,6 @@
           </dd>
           <dt>Current sign in IP address</dt>
           <dd class="sm-margin-bottom">{{ user.current_sign_in_ip }}</dd>
-          <dt>Active status</dt>
-          <dd class="sm-margin-bottom">{{ user.active }}</dd>
-          <dt>Confirm status</dt>
-          <dd class="sm-margin-bottom">{{ user.confirmed }}</dd>
           <dt>Previous sign in date</dt>
           <dd class="sm-margin-bottom">
             {% if user.last_sign_in_on %}
