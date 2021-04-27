@@ -21,7 +21,7 @@ class DashBoard(object):
     @classmethod
     def group_and_count_coupons(cls):
         '''
-        Obtain coupon code statistic across subscribers
+        Obtain coupon code statistic across subscribers 
         '''
         not_null = db.session.query(Subscription).filter(Subscription.coupon.isnot(None)).count()
         total = db.session.query(func.count(Subscription.id)).scalar()
