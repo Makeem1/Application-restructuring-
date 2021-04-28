@@ -17,6 +17,7 @@
                class="img-responsive"
                width="229" height="50" title="Snake Eyes" alt="Snake Eyes"/>
         </a>
+       
       </div>
       <ul class="nav navbar-nav">
         {% if current_user.role == 'admin' %}
@@ -25,6 +26,7 @@
             </li>
           {% endif %}
           {% if current_user.is_authenticated and current_user.subscription %}
+            <li><a href="{{ url_for('bet.place_bet') }}"> <span class="label label-primary">Place bet</span> </a></li>
           {% else %}
             <li><a href="{{ url_for('billing.pricing') }}">Pricing</a></li>
           {% endif %}
@@ -56,7 +58,7 @@
                  aria-expanded="false">Account
                 <span class="caret"></span></a>
                 <li><a href="{{url_for('user.logout')}}">logout</a></li>
-              <ul class="dropdown-menu">
+              <ul class="dropdown-menu">z
                 <li><a href="{{ url_for('user.settings') }}">Settings</a></li>
                 <li role="separator" class="divider"></li>
                 <li class="dropdown-header">Session</li>
